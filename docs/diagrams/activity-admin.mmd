@@ -1,0 +1,45 @@
+flowchart TD
+    A([Start]) --> B[Admin Buka Halaman Login]
+    B --> C[Input Username & Password]
+    C --> D{Validasi Login}
+    
+    D -->|Gagal| E[Tampilkan Error]
+    E --> C
+    
+    D -->|Berhasil| F[Redirect ke Dashboard]
+    F --> G{Pilih Menu Admin}
+    
+    G -->|Kitchen Display| H[Lihat Pesanan Aktif]
+    H --> I{Update Status?}
+    I -->|Ya| J[Ubah Status Pesanan]
+    J --> K[Simpan ke Database]
+    K --> H
+    I -->|Tidak| G
+    
+    G -->|Kelola Menu| L[Lihat Daftar Produk]
+    L --> M{Aksi?}
+    M -->|Tambah| N[Form Tambah Menu]
+    N --> O[Input Data & Upload Gambar]
+    O --> P[Simpan Produk Baru]
+    P --> L
+    M -->|Edit| Q[Form Edit Menu]
+    Q --> R[Update Data]
+    R --> L
+    M -->|Hapus| S[Konfirmasi Hapus]
+    S --> T[Delete dari Database]
+    T --> L
+    M -->|Kembali| G
+    
+    G -->|Kelola Kategori| U[Lihat Daftar Kategori]
+    U --> V{Aksi?}
+    V -->|Tambah/Edit| W[Form Kategori]
+    W --> X[Simpan Kategori]
+    X --> U
+    V -->|Kembali| G
+    
+    G -->|Laporan| Y[Pilih Range Tanggal]
+    Y --> Z[Tampilkan Statistik]
+    Z --> G
+    
+    G -->|Logout| AA[Hapus Session]
+    AA --> AB([End])

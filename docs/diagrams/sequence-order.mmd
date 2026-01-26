@@ -1,0 +1,55 @@
+sequenceDiagram
+    autonumber
+    participant P as Pelanggan
+    participant B as Browser
+    participant S as Server (Express)
+    participant DB as MySQL Database
+    participant K as Kitchen Display
+
+    P->>B: Scan QR Code (?meja=5)
+    B->>S: GET /menu?meja=5
+    S->>S: Set session.tableNumber = 5
+    S->>DB: SELECT * FROM categories, products
+    DB-->>S: Return menu data
+    S-->>B: Render menu.ejs
+    B-->>P: Tampilkan halaman menu
+
+    P->>B: Klik menu item
+    B->>S: GET /menu/product/:id
+    S->>DB: SELECT * FROM products WHERE id=:id
+    DB-->>S: Return product detail
+    S-->>B: Return JSON product
+    B-->>P: Tampilkan modal varian
+
+    P->>B: Pilih varian & Tambah ke Cart
+    B->>S: POST /cart/add
+    S->>S: Update session.cart
+    S-->>B: Return cart count
+    B-->>P: Update floating cart badge
+
+    P->>B: Klik Checkout
+    B->>S: GET /order/checkout
+    S-->>B: Render checkout.ejs
+    B-->>P: Tampilkan form checkout
+
+    P->>B: Input nama & Submit
+    B->>S: POST /order/place
+    S->>S: Generate order_number
+    S->>DB: BEGIN TRANSACTION
+    S->>DB: INSERT INTO orders
+    DB-->>S: Return order_id
+    S->>DB: INSERT INTO order_items (loop)
+    S->>DB: COMMIT
+    S->>S: Clear session.cart
+    S-->>B: Redirect to success page
+    B-->>P: Tampilkan order success
+
+    K->>S: GET /admin/kitchen
+    S->>DB: SELECT orders WHERE status IN (pending, cooking)
+    DB-->>S: Return active orders
+    S-->>K: Render kitchen.ejs
+
+    K->>S: POST /admin/orders/:id/status
+    S->>DB: UPDATE orders SET status
+    DB-->>S: Success
+    S-->>K: Return JSON success

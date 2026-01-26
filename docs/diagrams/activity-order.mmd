@@ -1,0 +1,38 @@
+flowchart TD
+    A([Start]) --> B[Pelanggan Scan QR Code di Meja]
+    B --> C[Sistem Deteksi Nomor Meja]
+    C --> D[Tampilkan Halaman Menu]
+    D --> E{Pilih Menu?}
+    
+    E -->|Ya| F[Klik Menu Item]
+    F --> G[Tampilkan Modal Varian]
+    G --> H{Ada Pilihan Varian?}
+    
+    H -->|Ya| I[Pilih Suhu/Gula/Ukuran]
+    H -->|Tidak| J[Set Default]
+    I --> K[Atur Jumlah]
+    J --> K
+    
+    K --> L[Klik Tambah ke Keranjang]
+    L --> M[Update Session Cart]
+    M --> N{Pesan Lagi?}
+    
+    N -->|Ya| D
+    N -->|Tidak| O[Buka Keranjang]
+    
+    E -->|Tidak| O
+    
+    O --> P[Review Pesanan]
+    P --> Q{Checkout?}
+    
+    Q -->|Ya| R[Input Nama Pelanggan]
+    R --> S[Konfirmasi Nomor Meja]
+    S --> T[Klik Pesan Sekarang]
+    T --> U[Simpan ke Database]
+    U --> V[Generate Order Number]
+    V --> W[Kosongkan Cart]
+    W --> X[Tampilkan Halaman Sukses]
+    X --> Y[Pelanggan Tunggu Pesanan]
+    Y --> Z([End])
+    
+    Q -->|Tidak| D

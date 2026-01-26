@@ -1,0 +1,93 @@
+classDiagram
+    class User {
+        +int id
+        +string username
+        +string password
+        +string full_name
+        +string role
+        +datetime created_at
+        +datetime updated_at
+        +login()
+        +logout()
+    }
+    
+    class Category {
+        +int id
+        +string name
+        +string icon
+        +int sort_order
+        +boolean is_active
+        +datetime created_at
+        +getProducts()
+    }
+    
+    class Product {
+        +int id
+        +int category_id
+        +string name
+        +int price
+        +string description
+        +string image
+        +boolean is_available
+        +boolean has_temperature_option
+        +boolean has_sugar_option
+        +boolean has_size_option
+        +int large_price_add
+        +datetime created_at
+        +datetime updated_at
+        +getCategory()
+        +calculatePrice()
+        +toggleAvailability()
+    }
+    
+    class Order {
+        +int id
+        +string order_number
+        +string customer_name
+        +string table_number
+        +int total_price
+        +string status
+        +string notes
+        +datetime created_at
+        +datetime updated_at
+        +getItems()
+        +updateStatus()
+        +calculateTotal()
+    }
+    
+    class OrderItem {
+        +int id
+        +int order_id
+        +int product_id
+        +int qty
+        +int price_at_order
+        +string variant_info
+        +string notes
+        +datetime created_at
+        +getProduct()
+        +getSubtotal()
+    }
+    
+    class Cart {
+        +array items
+        +int tableNumber
+        +addItem()
+        +removeItem()
+        +updateQuantity()
+        +clear()
+        +getTotal()
+    }
+    
+    class CompanyInfo {
+        +int id
+        +string key_name
+        +string value
+        +datetime updated_at
+        +getValue()
+        +setValue()
+    }
+    
+    Category "1" --> "*" Product : contains
+    Order "1" --> "*" OrderItem : has
+    Product "1" --> "*" OrderItem : ordered_as
+    Cart "1" --> "*" Product : contains
