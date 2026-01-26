@@ -17,10 +17,13 @@ app.use(express.json());
 
 // Session Configuration
 app.use(session({
-    secret: 'house-of-nosty-secret-key-2024',
+    secret: process.env.SESSION_SECRET || 'house-of-nosty-secret-key-2024',
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+    cookie: { 
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        secure: process.env.NODE_ENV === 'production'
+    }
 }));
 
 // Flash Messages
