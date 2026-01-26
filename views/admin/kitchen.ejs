@@ -20,15 +20,36 @@
             <p class="text-muted">Semua pesanan sudah selesai diproses</p>
         </div>
         <% } else { %>
+        
+        <!-- Status Flow Legend -->
+        <div class="mb-4 p-3 bg-secondary rounded">
+            <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap text-white">
+                <span class="badge bg-warning text-dark">PENDING</span>
+                <i class="fas fa-arrow-right"></i>
+                <span class="badge bg-success">LUNAS</span>
+                <i class="fas fa-arrow-right"></i>
+                <span class="badge bg-info">MASAK</span>
+                <i class="fas fa-arrow-right"></i>
+                <span class="badge bg-primary">ANTAR</span>
+            </div>
+        </div>
+        
         <div class="row g-3">
             <% orders.forEach(order => { %>
             <div class="col-md-4 col-lg-3">
-                <div class="card h-100 border-0 shadow <%= order.status === 'pending' ? 'border-start border-warning border-4' : 'border-start border-info border-4' %>">
+                <div class="card h-100 border-0 shadow 
+                    <%= order.status === 'pending' ? 'border-start border-warning border-4' : '' %>
+                    <%= order.status === 'paid' ? 'border-start border-success border-4' : '' %>
+                    <%= order.status === 'cooking' ? 'border-start border-info border-4' : '' %>">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="badge <%= order.status === 'pending' ? 'bg-warning text-dark' : 'bg-info' %> me-2">
-                                <%= order.status === 'pending' ? 'BARU' : 'MASAK' %>
-                            </span>
+                            <% if (order.status === 'pending') { %>
+                            <span class="badge bg-warning text-dark me-2">PENDING</span>
+                            <% } else if (order.status === 'paid') { %>
+                            <span class="badge bg-success me-2">LUNAS</span>
+                            <% } else if (order.status === 'cooking') { %>
+                            <span class="badge bg-info me-2">MASAK</span>
+                            <% } %>
                             <strong>Meja <%= order.table_number %></strong>
                         </div>
                         <small class="text-muted">
@@ -38,6 +59,7 @@
                     </div>
                     <div class="card-body">
                         <p class="mb-2"><strong><%= order.customer_name %></strong></p>
+                        <p class="mb-2 text-success fw-bold">Rp <%= order.total_price.toLocaleString('id-ID') %></p>
                         <ul class="list-unstyled mb-0">
                             <% order.items.forEach(item => { %>
                             <li class="mb-2 pb-2 border-bottom">
@@ -56,12 +78,16 @@
                     </div>
                     <div class="card-footer bg-white">
                         <% if (order.status === 'pending') { %>
-                        <button class="btn btn-info w-100 status-btn" data-order-id="<%= order.id %>" data-status="cooking">
-                            <i class="fas fa-fire me-1"></i>Proses
+                        <button class="btn btn-success w-100 status-btn" data-order-id="<%= order.id %>" data-status="paid">
+                            <i class="fas fa-money-bill-wave me-1"></i>Bayar (Lunas)
                         </button>
-                        <% } else { %>
-                        <button class="btn btn-success w-100 status-btn" data-order-id="<%= order.id %>" data-status="served">
-                            <i class="fas fa-check me-1"></i>Selesai
+                        <% } else if (order.status === 'paid') { %>
+                        <button class="btn btn-info w-100 status-btn" data-order-id="<%= order.id %>" data-status="cooking">
+                            <i class="fas fa-fire me-1"></i>Masak
+                        </button>
+                        <% } else if (order.status === 'cooking') { %>
+                        <button class="btn btn-primary w-100 status-btn" data-order-id="<%= order.id %>" data-status="served">
+                            <i class="fas fa-motorcycle me-1"></i>Antar
                         </button>
                         <% } %>
                     </div>

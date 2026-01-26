@@ -19,9 +19,9 @@
                         <select name="status" class="form-select">
                             <option value="">Semua Status</option>
                             <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                            <option value="paid" <%= filters.status === 'paid' ? 'selected' : '' %>>Lunas</option>
                             <option value="cooking" <%= filters.status === 'cooking' ? 'selected' : '' %>>Dimasak</option>
                             <option value="served" <%= filters.status === 'served' ? 'selected' : '' %>>Diantar</option>
-                            <option value="paid" <%= filters.status === 'paid' ? 'selected' : '' %>>Lunas</option>
                             <option value="cancelled" <%= filters.status === 'cancelled' ? 'selected' : '' %>>Dibatalkan</option>
                         </select>
                     </div>
@@ -65,12 +65,12 @@
                                 <td>
                                     <% if (order.status === 'pending') { %>
                                     <span class="badge bg-warning text-dark">Pending</span>
+                                    <% } else if (order.status === 'paid') { %>
+                                    <span class="badge bg-success">Lunas</span>
                                     <% } else if (order.status === 'cooking') { %>
                                     <span class="badge bg-info">Dimasak</span>
                                     <% } else if (order.status === 'served') { %>
-                                    <span class="badge bg-success">Diantar</span>
-                                    <% } else if (order.status === 'paid') { %>
-                                    <span class="badge bg-secondary">Lunas</span>
+                                    <span class="badge bg-primary">Diantar</span>
                                     <% } else if (order.status === 'cancelled') { %>
                                     <span class="badge bg-danger">Dibatalkan</span>
                                     <% } %>

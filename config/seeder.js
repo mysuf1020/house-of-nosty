@@ -25,10 +25,21 @@ async function seedDatabase() {
             );
             console.log('✅ Kitchen user created (username: kitchen, password: admin123)');
         } else {
-            // Update existing admin password to ensure it works
+            // Update existing admin & kitchen password to ensure it works
             const hashedPassword = await bcrypt.hash('admin123', 10);
             await db.query('UPDATE users SET password = ? WHERE username = ?', [hashedPassword, 'admin']);
-            console.log('✅ Admin password updated');
+            await db.query('UPDATE users SET password = ? WHERE username = ?', [hashedPassword, 'kitchen']);
+            
+            // Ensure kitchen user exists
+            const [kitchenUser] = await db.query('SELECT * FROM users WHERE username = ?', ['kitchen']);
+            if (kitchenUser.length === 0) {
+                await db.query(
+                    'INSERT INTO users (username, password, full_name, role) VALUES (?, ?, ?, ?)',
+                    ['kitchen', hashedPassword, 'Dapur', 'kitchen']
+                );
+                console.log('✅ Kitchen user created');
+            }
+            console.log('✅ Admin & Kitchen password updated');
         }
         
         // Check if categories exist

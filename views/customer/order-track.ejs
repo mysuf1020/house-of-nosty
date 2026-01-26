@@ -27,45 +27,45 @@
                 </div>
             </div>
             
-            <!-- Status Timeline -->
+            <!-- Status Timeline: Pending -> Lunas -> Masak -> Antar -->
             <div class="status-timeline py-4">
                 <div class="d-flex justify-content-between position-relative">
                     <div class="status-line position-absolute" style="top: 15px; left: 10%; right: 10%; height: 3px; background: #e9ecef; z-index: 0;"></div>
                     
                     <div class="status-step text-center" style="z-index: 1;">
                         <div class="status-icon rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 
-                            <%= ['pending', 'cooking', 'served', 'paid'].includes(order.status) ? 'bg-success text-white' : 'bg-light text-muted' %>" 
+                            <%= ['pending', 'paid', 'cooking', 'served'].includes(order.status) ? 'bg-warning text-dark' : 'bg-light text-muted' %>" 
                             style="width: 40px; height: 40px;">
                             <i class="fas fa-receipt"></i>
                         </div>
-                        <small class="d-block">Diterima</small>
+                        <small class="d-block">Pending</small>
                     </div>
                     
                     <div class="status-step text-center" style="z-index: 1;">
                         <div class="status-icon rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 
-                            <%= ['cooking', 'served', 'paid'].includes(order.status) ? 'bg-success text-white' : 'bg-light text-muted' %>" 
-                            style="width: 40px; height: 40px;">
-                            <i class="fas fa-fire"></i>
-                        </div>
-                        <small class="d-block">Dimasak</small>
-                    </div>
-                    
-                    <div class="status-step text-center" style="z-index: 1;">
-                        <div class="status-icon rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 
-                            <%= ['served', 'paid'].includes(order.status) ? 'bg-success text-white' : 'bg-light text-muted' %>" 
-                            style="width: 40px; height: 40px;">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <small class="d-block">Diantar</small>
-                    </div>
-                    
-                    <div class="status-step text-center" style="z-index: 1;">
-                        <div class="status-icon rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 
-                            <%= order.status === 'paid' ? 'bg-success text-white' : 'bg-light text-muted' %>" 
+                            <%= ['paid', 'cooking', 'served'].includes(order.status) ? 'bg-success text-white' : 'bg-light text-muted' %>" 
                             style="width: 40px; height: 40px;">
                             <i class="fas fa-money-bill"></i>
                         </div>
                         <small class="d-block">Lunas</small>
+                    </div>
+                    
+                    <div class="status-step text-center" style="z-index: 1;">
+                        <div class="status-icon rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 
+                            <%= ['cooking', 'served'].includes(order.status) ? 'bg-info text-white' : 'bg-light text-muted' %>" 
+                            style="width: 40px; height: 40px;">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <small class="d-block">Masak</small>
+                    </div>
+                    
+                    <div class="status-step text-center" style="z-index: 1;">
+                        <div class="status-icon rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 
+                            <%= order.status === 'served' ? 'bg-primary text-white' : 'bg-light text-muted' %>" 
+                            style="width: 40px; height: 40px;">
+                            <i class="fas fa-motorcycle"></i>
+                        </div>
+                        <small class="d-block">Antar</small>
                     </div>
                 </div>
             </div>
@@ -73,19 +73,19 @@
             <div class="text-center">
                 <% if (order.status === 'pending') { %>
                 <span class="badge bg-warning text-dark fs-6 px-3 py-2">
-                    <i class="fas fa-clock me-1"></i>Menunggu Konfirmasi
+                    <i class="fas fa-clock me-1"></i>Menunggu Pembayaran
+                </span>
+                <% } else if (order.status === 'paid') { %>
+                <span class="badge bg-success fs-6 px-3 py-2">
+                    <i class="fas fa-money-bill me-1"></i>Sudah Dibayar (Lunas)
                 </span>
                 <% } else if (order.status === 'cooking') { %>
                 <span class="badge bg-info text-white fs-6 px-3 py-2">
                     <i class="fas fa-fire me-1"></i>Sedang Dimasak
                 </span>
                 <% } else if (order.status === 'served') { %>
-                <span class="badge bg-success fs-6 px-3 py-2">
-                    <i class="fas fa-check me-1"></i>Sudah Diantar
-                </span>
-                <% } else if (order.status === 'paid') { %>
-                <span class="badge bg-secondary fs-6 px-3 py-2">
-                    <i class="fas fa-check-double me-1"></i>Selesai
+                <span class="badge bg-primary fs-6 px-3 py-2">
+                    <i class="fas fa-motorcycle me-1"></i>Sudah Diantar
                 </span>
                 <% } else if (order.status === 'cancelled') { %>
                 <span class="badge bg-danger fs-6 px-3 py-2">

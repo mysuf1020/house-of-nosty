@@ -13,9 +13,9 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-outline-warning status-btn" data-status="pending">Pending</button>
+                <button class="btn btn-outline-success status-btn" data-status="paid">Lunas</button>
                 <button class="btn btn-outline-info status-btn" data-status="cooking">Masak</button>
-                <button class="btn btn-outline-success status-btn" data-status="served">Antar</button>
-                <button class="btn btn-outline-secondary status-btn" data-status="paid">Lunas</button>
+                <button class="btn btn-outline-primary status-btn" data-status="served">Antar</button>
             </div>
         </div>
         
@@ -66,12 +66,12 @@
                         <p class="mb-2"><strong>Status:</strong> 
                             <% if (order.status === 'pending') { %>
                             <span class="badge bg-warning text-dark">Pending</span>
+                            <% } else if (order.status === 'paid') { %>
+                            <span class="badge bg-success">Lunas</span>
                             <% } else if (order.status === 'cooking') { %>
                             <span class="badge bg-info">Dimasak</span>
                             <% } else if (order.status === 'served') { %>
-                            <span class="badge bg-success">Diantar</span>
-                            <% } else if (order.status === 'paid') { %>
-                            <span class="badge bg-secondary">Lunas</span>
+                            <span class="badge bg-primary">Diantar</span>
                             <% } else { %>
                             <span class="badge bg-danger">Dibatalkan</span>
                             <% } %>

@@ -127,11 +127,12 @@ router.get('/kitchen', isAuthenticated, async (req, res) => {
     try {
         const [orders] = await db.query(
             `SELECT * FROM orders 
-             WHERE status IN ('pending', 'cooking') 
+             WHERE status IN ('pending', 'paid', 'cooking') 
              ORDER BY 
                 CASE status 
                     WHEN 'pending' THEN 1 
-                    WHEN 'cooking' THEN 2 
+                    WHEN 'paid' THEN 2
+                    WHEN 'cooking' THEN 3 
                 END,
                 created_at ASC`
         );
