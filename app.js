@@ -15,14 +15,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Trust proxy for Railway/Heroku
+app.set('trust proxy', 1);
+
 // Session Configuration
 app.use(session({
     secret: process.env.SESSION_SECRET || 'house-of-nosty-secret-key-2024',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: { 
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        secure: process.env.NODE_ENV === 'production'
+        secure: false, // Set false for Railway compatibility
+        httpOnly: true,
+        sameSite: 'lax'
     }
 }));
 
