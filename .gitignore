@@ -21,9 +21,9 @@ Thumbs.db
 *.swp
 *.swo
 
-# Uploads (keep folder structure but ignore uploaded files)
-public/uploads/menu/*
-!public/uploads/menu/.gitkeep
+# Uploads - include menu images for deployment
+# public/uploads/menu/*
+# !public/uploads/menu/.gitkeep
 
 # Build
 dist/
