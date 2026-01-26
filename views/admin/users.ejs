@@ -1,0 +1,193 @@
+<%- include('../partials/header') %>
+
+<div class="admin-wrapper d-flex">
+    <%- include('../partials/admin-sidebar', { activeMenu: 'users' }) %>
+    
+    <main class="admin-content flex-grow-1 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">Kelola User</h4>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <i class="fas fa-plus me-1"></i>Tambah User
+            </button>
+        </div>
+        
+        <%- include('../partials/flash-messages') %>
+        
+        <!-- Today's Active Staff -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                <h6 class="fw-bold mb-0"><i class="fas fa-user-clock me-2"></i>Staff Aktif Hari Ini (<%= new Date().toLocaleDateString('id-ID') %>)</h6>
+            </div>
+            <div class="card-body">
+                <% if (todayShifts.length === 0) { %>
+                <p class="text-muted mb-0 text-center">Belum ada staff yang login hari ini</p>
+                <% } else { %>
+                <div class="row g-3">
+                    <% todayShifts.forEach(shift => { %>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center p-2 border rounded">
+                            <div class="me-3">
+                                <% if (shift.role === 'kasir') { %>
+                                <span class="badge bg-info fs-6"><i class="fas fa-cash-register"></i></span>
+                                <% } else if (shift.role === 'kitchen') { %>
+                                <span class="badge bg-warning text-dark fs-6"><i class="fas fa-fire"></i></span>
+                                <% } else { %>
+                                <span class="badge bg-primary fs-6"><i class="fas fa-user-shield"></i></span>
+                                <% } %>
+                            </div>
+                            <div>
+                                <strong><%= shift.full_name %></strong>
+                                <br><small class="text-muted text-capitalize"><%= shift.role %> - Login: <%= new Date(shift.check_in).toLocaleTimeString('id-ID') %></small>
+                            </div>
+                        </div>
+                    </div>
+                    <% }) %>
+                </div>
+                <% } %>
+            </div>
+        </div>
+        
+        <!-- Users Table -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Username</th>
+                                <th>Nama Lengkap</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Dibuat</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.forEach(user => { %>
+                            <tr>
+                                <td><strong><%= user.username %></strong></td>
+                                <td><%= user.full_name %></td>
+                                <td>
+                                    <% if (user.role === 'admin') { %>
+                                    <span class="badge bg-primary">Admin</span>
+                                    <% } else if (user.role === 'kasir') { %>
+                                    <span class="badge bg-info">Kasir</span>
+                                    <% } else { %>
+                                    <span class="badge bg-warning text-dark">Kitchen</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (user.is_active) { %>
+                                    <span class="badge bg-success">Aktif</span>
+                                    <% } else { %>
+                                    <span class="badge bg-secondary">Nonaktif</span>
+                                    <% } %>
+                                </td>
+                                <td><%= new Date(user.created_at).toLocaleDateString('id-ID') %></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editUserModal<%= user.id %>">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <% if (user.username !== 'admin') { %>
+                                    <form action="/admin/users/delete/<%= user.id %>" method="POST" class="d-inline" onsubmit="return confirm('Yakin hapus user ini?')">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                    <% } %>
+                                </td>
+                            </tr>
+                            
+                            <!-- Edit Modal for each user -->
+                            <div class="modal fade" id="editUserModal<%= user.id %>" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form action="/admin/users/edit/<%= user.id %>" method="POST">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Edit User</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Username</label>
+                                                    <input type="text" class="form-control" value="<%= user.username %>" disabled>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Nama Lengkap</label>
+                                                    <input type="text" name="full_name" class="form-control" value="<%= user.full_name %>" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Role</label>
+                                                    <select name="role" class="form-select" required>
+                                                        <option value="admin" <%= user.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                                                        <option value="kasir" <%= user.role === 'kasir' ? 'selected' : '' %>>Kasir</option>
+                                                        <option value="kitchen" <%= user.role === 'kitchen' ? 'selected' : '' %>>Kitchen</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Password Baru (kosongkan jika tidak diubah)</label>
+                                                    <input type="password" name="password" class="form-control">
+                                                </div>
+                                                <div class="form-check">
+                                                    <input type="checkbox" name="is_active" class="form-check-input" id="isActive<%= user.id %>" <%= user.is_active ? 'checked' : '' %>>
+                                                    <label class="form-check-label" for="isActive<%= user.id %>">Aktif</label>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-primary">Simpan</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/admin/users/add" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah User Baru</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nama Lengkap</label>
+                        <input type="text" name="full_name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select name="role" class="form-select" required>
+                            <option value="kasir">Kasir</option>
+                            <option value="kitchen">Kitchen</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Tambah</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

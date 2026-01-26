@@ -41,6 +41,16 @@
             </li>
             <% if (user && user.role === 'admin') { %>
             <li class="nav-item mb-2">
+                <a class="nav-link text-white <%= typeof activeMenu !== 'undefined' && activeMenu === 'users' ? 'active bg-primary rounded' : '' %>" href="/admin/users">
+                    <i class="fas fa-users me-2"></i> Kelola User
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white <%= typeof activeMenu !== 'undefined' && activeMenu === 'logs' ? 'active bg-primary rounded' : '' %>" href="/admin/logs">
+                    <i class="fas fa-history me-2"></i> Log Aktivitas
+                </a>
+            </li>
+            <li class="nav-item mb-2">
                 <a class="nav-link text-white <%= typeof activeMenu !== 'undefined' && activeMenu === 'settings' ? 'active bg-primary rounded' : '' %>" href="/admin/settings">
                     <i class="fas fa-cog me-2"></i> Pengaturan
                 </a>

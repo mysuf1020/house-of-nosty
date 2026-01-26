@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     full_name VARCHAR(100),
-    role ENUM('admin', 'kitchen') DEFAULT 'admin',
+    role ENUM('admin', 'kasir', 'kitchen') DEFAULT 'admin',
+    is_active TINYINT(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -145,6 +146,33 @@ INSERT INTO products (category_id, name, price, description, has_temperature_opt
 (4, 'Roti Bakar', 18000, 'Roti bakar dengan berbagai topping', 0, 0, 0),
 (4, 'Pisang Goreng', 15000, 'Pisang goreng crispy dengan topping', 0, 0, 0),
 (4, 'Croffle', 25000, 'Croissant waffle dengan topping', 0, 0, 0);
+
+-- =====================================================
+-- 7. TABEL ACTIVITY_LOGS (Log Aktivitas Staff)
+-- =====================================================
+CREATE TABLE IF NOT EXISTS activity_logs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    action VARCHAR(100) NOT NULL,
+    description TEXT,
+    order_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL
+);
+
+-- =====================================================
+-- 8. TABEL STAFF_SHIFTS (Shift Kerja Hari Ini)
+-- =====================================================
+CREATE TABLE IF NOT EXISTS staff_shifts (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    shift_date DATE NOT NULL,
+    check_in TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    check_out TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_shift (user_id, shift_date)
+);
 
 -- Insert Company Info
 INSERT INTO company_info (key_name, value) VALUES 

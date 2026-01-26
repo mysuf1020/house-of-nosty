@@ -3,44 +3,28 @@ const bcrypt = require('bcryptjs');
 
 async function seedDatabase() {
     try {
-        // Check if admin user exists
-        const [users] = await db.query('SELECT * FROM users WHERE username = ?', ['admin']);
+        const hashedPassword = await bcrypt.hash('admin123', 10);
         
-        if (users.length === 0) {
-            // Hash password
-            const hashedPassword = await bcrypt.hash('admin123', 10);
-            
-            // Insert admin user
-            await db.query(
-                'INSERT INTO users (username, password, full_name, role) VALUES (?, ?, ?, ?)',
-                ['admin', hashedPassword, 'Administrator', 'admin']
-            );
-            console.log('✅ Admin user created (username: admin, password: admin123)');
-            
-            // Insert kitchen user
-            const kitchenPassword = await bcrypt.hash('admin123', 10);
-            await db.query(
-                'INSERT INTO users (username, password, full_name, role) VALUES (?, ?, ?, ?)',
-                ['kitchen', kitchenPassword, 'Dapur', 'kitchen']
-            );
-            console.log('✅ Kitchen user created (username: kitchen, password: admin123)');
-        } else {
-            // Update existing admin & kitchen password to ensure it works
-            const hashedPassword = await bcrypt.hash('admin123', 10);
-            await db.query('UPDATE users SET password = ? WHERE username = ?', [hashedPassword, 'admin']);
-            await db.query('UPDATE users SET password = ? WHERE username = ?', [hashedPassword, 'kitchen']);
-            
-            // Ensure kitchen user exists
-            const [kitchenUser] = await db.query('SELECT * FROM users WHERE username = ?', ['kitchen']);
-            if (kitchenUser.length === 0) {
+        // Seed default users
+        const defaultUsers = [
+            { username: 'admin', full_name: 'Administrator', role: 'admin' },
+            { username: 'kasir1', full_name: 'Kasir 1', role: 'kasir' },
+            { username: 'kitchen1', full_name: 'Kitchen 1', role: 'kitchen' }
+        ];
+        
+        for (const user of defaultUsers) {
+            const [existing] = await db.query('SELECT * FROM users WHERE username = ?', [user.username]);
+            if (existing.length === 0) {
                 await db.query(
                     'INSERT INTO users (username, password, full_name, role) VALUES (?, ?, ?, ?)',
-                    ['kitchen', hashedPassword, 'Dapur', 'kitchen']
+                    [user.username, hashedPassword, user.full_name, user.role]
                 );
-                console.log('✅ Kitchen user created');
+                console.log(`✅ User ${user.username} created (password: admin123)`);
+            } else {
+                await db.query('UPDATE users SET password = ? WHERE username = ?', [hashedPassword, user.username]);
             }
-            console.log('✅ Admin & Kitchen password updated');
         }
+        console.log('✅ Users seeded/updated');
         
         // Check if categories exist
         const [categories] = await db.query('SELECT * FROM categories');

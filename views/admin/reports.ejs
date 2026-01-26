@@ -5,7 +5,7 @@
     
     <main class="admin-content flex-grow-1 p-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="fw-bold mb-0">Laporan Penjualan</h4>
+            <h4 class="fw-bold mb-0"><i class="fas fa-chart-bar me-2"></i>Laporan Penjualan</h4>
         </div>
         
         <!-- Date Filter -->
@@ -14,68 +14,133 @@
                 <form method="GET" class="row g-3 align-items-end">
                     <div class="col-md-3">
                         <label class="form-label">Dari Tanggal</label>
-                        <input type="date" name="start_date" class="form-control" value="<%= filters.start_date || '' %>">
+                        <input type="date" name="start_date" class="form-control" value="<%= filters.start_date || new Date().toISOString().split('T')[0] %>">
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">Sampai Tanggal</label>
-                        <input type="date" name="end_date" class="form-control" value="<%= filters.end_date || '' %>">
+                        <input type="date" name="end_date" class="form-control" value="<%= filters.end_date || new Date().toISOString().split('T')[0] %>">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <button type="submit" class="btn btn-primary"><i class="fas fa-filter me-1"></i>Filter</button>
                         <a href="/admin/reports" class="btn btn-outline-secondary">Hari Ini</a>
+                        <a href="/admin/reports?start_date=<%= new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0] %>&end_date=<%= new Date().toISOString().split('T')[0] %>" class="btn btn-outline-info">7 Hari</a>
+                        <a href="/admin/reports?start_date=<%= new Date(Date.now() - 30*24*60*60*1000).toISOString().split('T')[0] %>&end_date=<%= new Date().toISOString().split('T')[0] %>" class="btn btn-outline-warning">30 Hari</a>
                     </div>
                 </form>
             </div>
         </div>
         
+        <!-- Period Info -->
+        <div class="alert alert-info mb-4">
+            <i class="fas fa-calendar me-2"></i>
+            <strong>Periode:</strong> 
+            <% if (filters.start_date && filters.end_date) { %>
+            <%= new Date(filters.start_date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %> 
+            s/d 
+            <%= new Date(filters.end_date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+            <% } else { %>
+            Hari Ini (<%= new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>)
+            <% } %>
+        </div>
+        
         <!-- Summary Cards -->
         <div class="row g-4 mb-4">
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm bg-success text-white">
-                    <div class="card-body text-center">
-                        <h6>Total Pendapatan</h6>
-                        <h2 class="fw-bold">Rp <%= summary.total_revenue.toLocaleString('id-ID') %></h2>
+                <div class="card border-0 shadow-sm bg-success text-white h-100">
+                    <div class="card-body text-center py-4">
+                        <i class="fas fa-money-bill-wave fa-2x mb-2"></i>
+                        <h6 class="mb-1">Total Pendapatan (Lunas)</h6>
+                        <h2 class="fw-bold mb-0">Rp <%= (summary.total_revenue || 0).toLocaleString('id-ID') %></h2>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm bg-primary text-white">
-                    <div class="card-body text-center">
-                        <h6>Total Pesanan</h6>
-                        <h2 class="fw-bold"><%= summary.total_orders %></h2>
+                <div class="card border-0 shadow-sm bg-primary text-white h-100">
+                    <div class="card-body text-center py-4">
+                        <i class="fas fa-receipt fa-2x mb-2"></i>
+                        <h6 class="mb-1">Total Pesanan (Lunas)</h6>
+                        <h2 class="fw-bold mb-0"><%= summary.total_orders || 0 %> pesanan</h2>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm bg-info text-white">
-                    <div class="card-body text-center">
-                        <h6>Rata-rata Transaksi</h6>
-                        <h2 class="fw-bold">Rp <%= Math.round(summary.avg_order_value).toLocaleString('id-ID') %></h2>
+                <div class="card border-0 shadow-sm bg-info text-white h-100">
+                    <div class="card-body text-center py-4">
+                        <i class="fas fa-calculator fa-2x mb-2"></i>
+                        <h6 class="mb-1">Rata-rata Transaksi</h6>
+                        <h2 class="fw-bold mb-0">Rp <%= Math.round(summary.avg_order_value || 0).toLocaleString('id-ID') %></h2>
                     </div>
                 </div>
             </div>
         </div>
         
+        <!-- Staff Active Today -->
+        <% if (todayShifts && todayShifts.length > 0) { %>
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-dark text-white">
+                <h6 class="fw-bold mb-0"><i class="fas fa-user-clock me-2"></i>Staff Aktif Hari Ini</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-3">
+                    <% todayShifts.forEach(shift => { %>
+                    <div class="d-flex align-items-center border rounded px-3 py-2">
+                        <% if (shift.role === 'kasir') { %>
+                        <span class="badge bg-info me-2"><i class="fas fa-cash-register"></i></span>
+                        <% } else if (shift.role === 'kitchen') { %>
+                        <span class="badge bg-warning text-dark me-2"><i class="fas fa-fire"></i></span>
+                        <% } else { %>
+                        <span class="badge bg-primary me-2"><i class="fas fa-user-shield"></i></span>
+                        <% } %>
+                        <div>
+                            <strong><%= shift.full_name %></strong>
+                            <small class="text-muted d-block text-capitalize"><%= shift.role %></small>
+                        </div>
+                    </div>
+                    <% }) %>
+                </div>
+            </div>
+        </div>
+        <% } %>
+        
         <div class="row g-4">
             <!-- Top Products -->
             <div class="col-md-6">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white"><h6 class="fw-bold mb-0">Menu Terlaris</h6></div>
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-warning text-dark">
+                        <h6 class="fw-bold mb-0"><i class="fas fa-trophy me-2"></i>Menu Terlaris (Top 10)</h6>
+                    </div>
                     <div class="card-body p-0">
-                        <table class="table mb-0">
+                        <table class="table table-hover mb-0">
                             <thead class="table-light">
-                                <tr><th>Menu</th><th>Terjual</th><th>Pendapatan</th></tr>
+                                <tr>
+                                    <th width="50">#</th>
+                                    <th>Menu</th>
+                                    <th class="text-center">Terjual</th>
+                                    <th class="text-end">Pendapatan</th>
+                                </tr>
                             </thead>
                             <tbody>
+                                <% if (topProducts && topProducts.length > 0) { %>
                                 <% topProducts.forEach((p, i) => { %>
                                 <tr>
-                                    <td><span class="badge bg-warning text-dark me-2"><%= i + 1 %></span><%= p.name %></td>
-                                    <td><%= p.total_sold %></td>
-                                    <td>Rp <%= p.revenue.toLocaleString('id-ID') %></td>
+                                    <td>
+                                        <% if (i === 0) { %>
+                                        <span class="badge bg-warning text-dark"><i class="fas fa-medal"></i> 1</span>
+                                        <% } else if (i === 1) { %>
+                                        <span class="badge bg-secondary">2</span>
+                                        <% } else if (i === 2) { %>
+                                        <span class="badge bg-danger">3</span>
+                                        <% } else { %>
+                                        <span class="badge bg-light text-dark"><%= i + 1 %></span>
+                                        <% } %>
+                                    </td>
+                                    <td><strong><%= p.name %></strong></td>
+                                    <td class="text-center"><span class="badge bg-primary"><%= p.total_sold %> pcs</span></td>
+                                    <td class="text-end text-success fw-bold">Rp <%= (p.revenue || 0).toLocaleString('id-ID') %></td>
                                 </tr>
                                 <% }) %>
-                                <% if (topProducts.length === 0) { %>
-                                <tr><td colspan="3" class="text-center text-muted">Belum ada data</td></tr>
+                                <% } else { %>
+                                <tr><td colspan="4" class="text-center text-muted py-4"><i class="fas fa-inbox fa-2x mb-2 d-block"></i>Belum ada data penjualan</td></tr>
                                 <% } %>
                             </tbody>
                         </table>
@@ -85,17 +150,52 @@
             
             <!-- Orders by Status -->
             <div class="col-md-6">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white"><h6 class="fw-bold mb-0">Pesanan per Status</h6></div>
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="fw-bold mb-0"><i class="fas fa-chart-pie me-2"></i>Pesanan per Status</h6>
+                    </div>
                     <div class="card-body">
-                        <% ordersByStatus.forEach(s => { %>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="text-capitalize"><%= s.status %></span>
-                            <span class="badge bg-secondary"><%= s.count %></span>
+                        <% if (ordersByStatus && ordersByStatus.length > 0) { %>
+                        <% 
+                        const statusConfig = {
+                            pending: { label: 'Pending', color: 'warning', icon: 'clock' },
+                            paid: { label: 'Lunas', color: 'success', icon: 'money-bill' },
+                            cooking: { label: 'Dimasak', color: 'info', icon: 'fire' },
+                            served: { label: 'Diantar', color: 'primary', icon: 'motorcycle' },
+                            cancelled: { label: 'Dibatalkan', color: 'danger', icon: 'times' }
+                        };
+                        const totalOrders = ordersByStatus.reduce((sum, s) => sum + s.count, 0);
+                        %>
+                        <% ordersByStatus.forEach(s => { 
+                            const config = statusConfig[s.status] || { label: s.status, color: 'secondary', icon: 'question' };
+                            const percentage = totalOrders > 0 ? Math.round((s.count / totalOrders) * 100) : 0;
+                        %>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>
+                                    <i class="fas fa-<%= config.icon %> text-<%= config.color %> me-2"></i>
+                                    <strong><%= config.label %></strong>
+                                </span>
+                                <span>
+                                    <span class="badge bg-<%= config.color %> <%= config.color === 'warning' ? 'text-dark' : '' %>"><%= s.count %> pesanan</span>
+                                    <small class="text-muted ms-1">(<%= percentage %>%)</small>
+                                </span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-<%= config.color %>" style="width: <%= percentage %>%"></div>
+                            </div>
                         </div>
                         <% }) %>
-                        <% if (ordersByStatus.length === 0) { %>
-                        <p class="text-muted text-center mb-0">Belum ada data</p>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <strong>Total Semua Pesanan</strong>
+                            <strong><%= totalOrders %> pesanan</strong>
+                        </div>
+                        <% } else { %>
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                            Belum ada data pesanan
+                        </div>
                         <% } %>
                     </div>
                 </div>

@@ -4,7 +4,32 @@ const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const path = require('path');
 const db = require('../config/database');
-const { isAuthenticated, isAdmin, isNotAuthenticated } = require('../middleware/auth');
+const { isAuthenticated, isAdmin, isKasirOrAdmin, isStaff, isNotAuthenticated } = require('../middleware/auth');
+
+// Helper function to log activity
+async function logActivity(userId, action, description, orderId = null) {
+    try {
+        await db.query(
+            'INSERT INTO activity_logs (user_id, action, description, order_id) VALUES (?, ?, ?, ?)',
+            [userId, action, description, orderId]
+        );
+    } catch (error) {
+        console.error('Error logging activity:', error);
+    }
+}
+
+// Helper function to record staff shift
+async function recordShift(userId) {
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        await db.query(
+            'INSERT IGNORE INTO staff_shifts (user_id, shift_date) VALUES (?, ?)',
+            [userId, today]
+        );
+    } catch (error) {
+        console.error('Error recording shift:', error);
+    }
+}
 
 // Multer config for image upload
 const storage = multer.diskStorage({
@@ -68,6 +93,10 @@ router.post('/login', isNotAuthenticated, async (req, res) => {
             role: user.role
         };
         
+        // Record shift and log activity
+        await recordShift(user.id);
+        await logActivity(user.id, 'LOGIN', `${user.full_name} (${user.role}) login ke sistem`);
+        
         req.flash('success_msg', 'Login berhasil!');
         res.redirect('/admin/dashboard');
     } catch (error) {
@@ -78,7 +107,10 @@ router.post('/login', isNotAuthenticated, async (req, res) => {
 });
 
 // Logout
-router.get('/logout', (req, res) => {
+router.get('/logout', async (req, res) => {
+    if (req.session.user) {
+        await logActivity(req.session.user.id, 'LOGOUT', `${req.session.user.fullName} logout dari sistem`);
+    }
     req.session.destroy();
     res.redirect('/admin/login');
 });
@@ -169,9 +201,22 @@ router.post('/orders/:id/status', isAuthenticated, async (req, res) => {
             return res.status(400).json({ error: 'Status tidak valid' });
         }
         
+        // Get order info for logging
+        const [orders] = await db.query('SELECT order_number, status as old_status FROM orders WHERE id = ?', [req.params.id]);
+        const order = orders[0];
+        
         await db.query(
             'UPDATE orders SET status = ? WHERE id = ?',
             [status, req.params.id]
+        );
+        
+        // Log activity
+        const statusLabels = { pending: 'Pending', paid: 'Lunas', cooking: 'Masak', served: 'Antar', cancelled: 'Batal' };
+        await logActivity(
+            req.session.user.id, 
+            'UPDATE_STATUS', 
+            `${req.session.user.fullName} mengubah status pesanan #${order.order_number} dari ${statusLabels[order.old_status]} ke ${statusLabels[status]}`,
+            req.params.id
         );
         
         res.json({ success: true });
@@ -506,7 +551,19 @@ router.get('/reports', isAuthenticated, async (req, res) => {
             `SELECT status, COUNT(*) as count
              FROM orders
              WHERE ${dateFilter}
-             GROUP BY status`
+             GROUP BY status`,
+            params
+        );
+        
+        // Get today's active staff
+        const today = new Date().toISOString().split('T')[0];
+        const [todayShifts] = await db.query(
+            `SELECT ss.*, u.full_name, u.role 
+             FROM staff_shifts ss 
+             JOIN users u ON ss.user_id = u.id 
+             WHERE ss.shift_date = ?
+             ORDER BY ss.check_in DESC`,
+            [today]
         );
         
         res.render('admin/reports', {
@@ -514,6 +571,7 @@ router.get('/reports', isAuthenticated, async (req, res) => {
             summary: summary[0],
             topProducts,
             ordersByStatus,
+            todayShifts,
             filters: { start_date, end_date }
         });
     } catch (error) {
@@ -562,6 +620,156 @@ router.post('/settings', isAuthenticated, isAdmin, async (req, res) => {
         console.error(error);
         req.flash('error_msg', 'Terjadi kesalahan');
         res.redirect('/admin/settings');
+    }
+});
+
+// ==================== USER MANAGEMENT ====================
+
+router.get('/users', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+        const [users] = await db.query(
+            'SELECT id, username, full_name, role, is_active, created_at FROM users ORDER BY role, full_name'
+        );
+        
+        // Get today's active staff
+        const today = new Date().toISOString().split('T')[0];
+        const [todayShifts] = await db.query(
+            `SELECT ss.*, u.full_name, u.role 
+             FROM staff_shifts ss 
+             JOIN users u ON ss.user_id = u.id 
+             WHERE ss.shift_date = ?
+             ORDER BY ss.check_in DESC`,
+            [today]
+        );
+        
+        res.render('admin/users', {
+            title: 'Kelola User - Admin House of Nosty',
+            users,
+            todayShifts
+        });
+    } catch (error) {
+        console.error(error);
+        res.render('error', { title: 'Error', message: 'Terjadi kesalahan' });
+    }
+});
+
+// Add user
+router.post('/users/add', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+        const { username, password, full_name, role } = req.body;
+        
+        // Check if username exists
+        const [existing] = await db.query('SELECT id FROM users WHERE username = ?', [username]);
+        if (existing.length > 0) {
+            req.flash('error_msg', 'Username sudah digunakan');
+            return res.redirect('/admin/users');
+        }
+        
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await db.query(
+            'INSERT INTO users (username, password, full_name, role) VALUES (?, ?, ?, ?)',
+            [username, hashedPassword, full_name, role]
+        );
+        
+        await logActivity(req.session.user.id, 'ADD_USER', `${req.session.user.fullName} menambahkan user baru: ${full_name} (${role})`);
+        
+        req.flash('success_msg', 'User berhasil ditambahkan');
+        res.redirect('/admin/users');
+    } catch (error) {
+        console.error(error);
+        req.flash('error_msg', 'Terjadi kesalahan');
+        res.redirect('/admin/users');
+    }
+});
+
+// Edit user
+router.post('/users/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+        const { full_name, role, is_active, password } = req.body;
+        
+        if (password && password.trim() !== '') {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            await db.query(
+                'UPDATE users SET full_name = ?, role = ?, is_active = ?, password = ? WHERE id = ?',
+                [full_name, role, is_active ? 1 : 0, hashedPassword, req.params.id]
+            );
+        } else {
+            await db.query(
+                'UPDATE users SET full_name = ?, role = ?, is_active = ? WHERE id = ?',
+                [full_name, role, is_active ? 1 : 0, req.params.id]
+            );
+        }
+        
+        await logActivity(req.session.user.id, 'EDIT_USER', `${req.session.user.fullName} mengubah data user ID ${req.params.id}`);
+        
+        req.flash('success_msg', 'User berhasil diperbarui');
+        res.redirect('/admin/users');
+    } catch (error) {
+        console.error(error);
+        req.flash('error_msg', 'Terjadi kesalahan');
+        res.redirect('/admin/users');
+    }
+});
+
+// Delete user
+router.post('/users/delete/:id', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+        // Prevent deleting self
+        if (parseInt(req.params.id) === req.session.user.id) {
+            req.flash('error_msg', 'Tidak dapat menghapus akun sendiri');
+            return res.redirect('/admin/users');
+        }
+        
+        await db.query('DELETE FROM users WHERE id = ?', [req.params.id]);
+        await logActivity(req.session.user.id, 'DELETE_USER', `${req.session.user.fullName} menghapus user ID ${req.params.id}`);
+        
+        req.flash('success_msg', 'User berhasil dihapus');
+        res.redirect('/admin/users');
+    } catch (error) {
+        console.error(error);
+        req.flash('error_msg', 'Terjadi kesalahan');
+        res.redirect('/admin/users');
+    }
+});
+
+// ==================== ACTIVITY LOGS ====================
+
+router.get('/logs', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+        const { date, user_id } = req.query;
+        
+        let query = `SELECT al.*, u.full_name, u.role 
+                     FROM activity_logs al 
+                     JOIN users u ON al.user_id = u.id 
+                     WHERE 1=1`;
+        const params = [];
+        
+        if (date) {
+            query += ' AND DATE(al.created_at) = ?';
+            params.push(date);
+        } else {
+            query += ' AND DATE(al.created_at) = CURDATE()';
+        }
+        
+        if (user_id) {
+            query += ' AND al.user_id = ?';
+            params.push(user_id);
+        }
+        
+        query += ' ORDER BY al.created_at DESC LIMIT 100';
+        
+        const [logs] = await db.query(query, params);
+        const [users] = await db.query('SELECT id, full_name, role FROM users ORDER BY full_name');
+        
+        res.render('admin/logs', {
+            title: 'Log Aktivitas - Admin House of Nosty',
+            logs,
+            users,
+            filters: { date, user_id }
+        });
+    } catch (error) {
+        console.error(error);
+        res.render('error', { title: 'Error', message: 'Terjadi kesalahan' });
     }
 });
 
