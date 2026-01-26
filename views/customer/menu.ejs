@@ -53,9 +53,9 @@
                     <div class="card-body p-2">
                         <div class="d-flex">
                             <div class="menu-item-img me-3">
-                                <img src="/uploads/menu/<%= item.image %>" alt="<%= item.name %>" 
+                                <img src="<%= item.image && item.image.startsWith('http') ? item.image : '/uploads/menu/' + item.image %>" alt="<%= item.name %>" 
                                      class="rounded" style="width: 80px; height: 80px; object-fit: cover;"
-                                     onerror="this.src='/images/default-menu.jpg'">
+                                     onerror="this.src='https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400'">
                             </div>
                             <div class="menu-item-info flex-grow-1">
                                 <h6 class="mb-1 fw-bold"><%= item.name %></h6>

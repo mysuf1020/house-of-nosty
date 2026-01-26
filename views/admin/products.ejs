@@ -31,9 +31,9 @@
                             <% products.forEach(product => { %>
                             <tr>
                                 <td>
-                                    <img src="/uploads/menu/<%= product.image %>" alt="<%= product.name %>" 
+                                    <img src="<%= product.image && product.image.startsWith('http') ? product.image : '/uploads/menu/' + product.image %>" alt="<%= product.name %>" 
                                          class="rounded" style="width: 50px; height: 50px; object-fit: cover;"
-                                         onerror="this.src='/images/default-menu.jpg'">
+                                         onerror="this.src='https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400'">
                                 </td>
                                 <td><strong><%= product.name %></strong></td>
                                 <td><span class="badge bg-secondary"><%= product.category_name %></span></td>
