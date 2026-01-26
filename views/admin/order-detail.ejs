@@ -1,0 +1,109 @@
+<%- include('../partials/header') %>
+
+<div class="admin-wrapper d-flex">
+    <%- include('../partials/admin-sidebar', { activeMenu: 'orders' }) %>
+    
+    <main class="admin-content flex-grow-1 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <a href="/admin/orders" class="text-muted text-decoration-none mb-2 d-inline-block">
+                    <i class="fas fa-arrow-left me-1"></i>Kembali
+                </a>
+                <h4 class="fw-bold mb-0">Detail Pesanan #<%= order.order_number %></h4>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-outline-warning status-btn" data-status="pending">Pending</button>
+                <button class="btn btn-outline-info status-btn" data-status="cooking">Masak</button>
+                <button class="btn btn-outline-success status-btn" data-status="served">Antar</button>
+                <button class="btn btn-outline-secondary status-btn" data-status="paid">Lunas</button>
+            </div>
+        </div>
+        
+        <%- include('../partials/flash-messages') %>
+        
+        <div class="row g-4">
+            <div class="col-md-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h6 class="fw-bold mb-0">Item Pesanan</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Menu</th>
+                                    <th>Varian</th>
+                                    <th>Qty</th>
+                                    <th>Harga</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% items.forEach(item => { %>
+                                <tr>
+                                    <td><%= item.product_name %></td>
+                                    <td><%= item.variant_info || '-' %></td>
+                                    <td><%= item.qty %></td>
+                                    <td>Rp <%= item.price_at_order.toLocaleString('id-ID') %></td>
+                                    <td>Rp <%= (item.price_at_order * item.qty).toLocaleString('id-ID') %></td>
+                                </tr>
+                                <% }) %>
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <th colspan="4" class="text-end">Total</th>
+                                    <th>Rp <%= order.total_price.toLocaleString('id-ID') %></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm mb-3">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-3">Info Pesanan</h6>
+                        <p class="mb-2"><strong>Status:</strong> 
+                            <% if (order.status === 'pending') { %>
+                            <span class="badge bg-warning text-dark">Pending</span>
+                            <% } else if (order.status === 'cooking') { %>
+                            <span class="badge bg-info">Dimasak</span>
+                            <% } else if (order.status === 'served') { %>
+                            <span class="badge bg-success">Diantar</span>
+                            <% } else if (order.status === 'paid') { %>
+                            <span class="badge bg-secondary">Lunas</span>
+                            <% } else { %>
+                            <span class="badge bg-danger">Dibatalkan</span>
+                            <% } %>
+                        </p>
+                        <p class="mb-2"><strong>Pelanggan:</strong> <%= order.customer_name %></p>
+                        <p class="mb-2"><strong>Meja:</strong> <%= order.table_number %></p>
+                        <p class="mb-2"><strong>Waktu:</strong> <%= new Date(order.created_at).toLocaleString('id-ID') %></p>
+                        <% if (order.notes) { %>
+                        <p class="mb-0"><strong>Catatan:</strong> <%= order.notes %></p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+document.querySelectorAll('.status-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const status = this.dataset.status;
+        fetch('/admin/orders/<%= order.id %>/status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (result.success) location.reload();
+        });
+    });
+});
+</script>
+
+<%- include('../partials/footer') %>

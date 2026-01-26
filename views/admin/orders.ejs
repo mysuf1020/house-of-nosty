@@ -1,0 +1,97 @@
+<%- include('../partials/header') %>
+
+<div class="admin-wrapper d-flex">
+    <%- include('../partials/admin-sidebar', { activeMenu: 'orders' }) %>
+    
+    <main class="admin-content flex-grow-1 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">Daftar Pesanan</h4>
+        </div>
+        
+        <%- include('../partials/flash-messages') %>
+        
+        <!-- Filters -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <form method="GET" class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select">
+                            <option value="">Semua Status</option>
+                            <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                            <option value="cooking" <%= filters.status === 'cooking' ? 'selected' : '' %>>Dimasak</option>
+                            <option value="served" <%= filters.status === 'served' ? 'selected' : '' %>>Diantar</option>
+                            <option value="paid" <%= filters.status === 'paid' ? 'selected' : '' %>>Lunas</option>
+                            <option value="cancelled" <%= filters.status === 'cancelled' ? 'selected' : '' %>>Dibatalkan</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Tanggal</label>
+                        <input type="date" name="date" class="form-control" value="<%= filters.date || '' %>">
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-1"></i>Filter
+                        </button>
+                        <a href="/admin/orders" class="btn btn-outline-secondary">Reset</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Orders Table -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>No. Pesanan</th>
+                                <th>Pelanggan</th>
+                                <th>Meja</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Waktu</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% orders.forEach(order => { %>
+                            <tr>
+                                <td><strong><%= order.order_number %></strong></td>
+                                <td><%= order.customer_name %></td>
+                                <td><span class="badge bg-dark"><%= order.table_number %></span></td>
+                                <td>Rp <%= order.total_price.toLocaleString('id-ID') %></td>
+                                <td>
+                                    <% if (order.status === 'pending') { %>
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    <% } else if (order.status === 'cooking') { %>
+                                    <span class="badge bg-info">Dimasak</span>
+                                    <% } else if (order.status === 'served') { %>
+                                    <span class="badge bg-success">Diantar</span>
+                                    <% } else if (order.status === 'paid') { %>
+                                    <span class="badge bg-secondary">Lunas</span>
+                                    <% } else if (order.status === 'cancelled') { %>
+                                    <span class="badge bg-danger">Dibatalkan</span>
+                                    <% } %>
+                                </td>
+                                <td><%= new Date(order.created_at).toLocaleString('id-ID') %></td>
+                                <td>
+                                    <a href="/admin/orders/<%= order.id %>" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <% }) %>
+                            <% if (orders.length === 0) { %>
+                            <tr><td colspan="7" class="text-center text-muted py-4">Tidak ada pesanan</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<%- include('../partials/footer') %>

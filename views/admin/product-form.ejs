@@ -1,0 +1,89 @@
+<%- include('../partials/header') %>
+
+<div class="admin-wrapper d-flex">
+    <%- include('../partials/admin-sidebar', { activeMenu: 'products' }) %>
+    
+    <main class="admin-content flex-grow-1 p-4">
+        <div class="mb-4">
+            <a href="/admin/products" class="text-muted text-decoration-none mb-2 d-inline-block">
+                <i class="fas fa-arrow-left me-1"></i>Kembali
+            </a>
+            <h4 class="fw-bold mb-0"><%= product ? 'Edit Menu' : 'Tambah Menu Baru' %></h4>
+        </div>
+        
+        <%- include('../partials/flash-messages') %>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <form action="/admin/products/<%= product ? 'edit/' + product.id : 'add' %>" method="POST" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label class="form-label">Nama Menu <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="name" value="<%= product ? product.name : '' %>" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Kategori <span class="text-danger">*</span></label>
+                                    <select name="category_id" class="form-select" required>
+                                        <% categories.forEach(cat => { %>
+                                        <option value="<%= cat.id %>" <%= product && product.category_id === cat.id ? 'selected' : '' %>><%= cat.name %></option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Harga (Rp) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" name="price" value="<%= product ? product.price : '' %>" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Deskripsi</label>
+                                <textarea class="form-control" name="description" rows="3"><%= product ? product.description : '' %></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Gambar Menu</label>
+                                <input type="file" class="form-control" name="image" accept="image/*">
+                                <% if (product && product.image) { %>
+                                <small class="text-muted">Gambar saat ini: <%= product.image %></small>
+                                <% } %>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="fw-bold mb-3">Opsi Varian</h6>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="has_temperature_option" id="tempOpt" 
+                                               <%= !product || product.has_temperature_option ? 'checked' : '' %>>
+                                        <label class="form-check-label" for="tempOpt">Pilihan Suhu (Hot/Ice)</label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="has_sugar_option" id="sugarOpt"
+                                               <%= !product || product.has_sugar_option ? 'checked' : '' %>>
+                                        <label class="form-check-label" for="sugarOpt">Pilihan Gula</label>
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" name="has_size_option" id="sizeOpt"
+                                               <%= product && product.has_size_option ? 'checked' : '' %>>
+                                        <label class="form-check-label" for="sizeOpt">Pilihan Ukuran</label>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label small">Tambahan Harga Large (Rp)</label>
+                                        <input type="number" class="form-control form-control-sm" name="large_price_add" 
+                                               value="<%= product ? product.large_price_add : 5000 %>">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save me-1"></i><%= product ? 'Simpan Perubahan' : 'Tambah Menu' %>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<%- include('../partials/footer') %>

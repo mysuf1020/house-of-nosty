@@ -1,0 +1,61 @@
+<!-- Admin Sidebar -->
+<div class="admin-sidebar bg-dark">
+    <div class="sidebar-header p-3 border-bottom border-secondary">
+        <a href="/admin/dashboard" class="text-white text-decoration-none">
+            <i class="fas fa-coffee me-2"></i>
+            <span class="fw-bold">House of Nosty</span>
+        </a>
+    </div>
+    
+    <nav class="sidebar-nav p-3">
+        <ul class="nav flex-column">
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white <%= typeof activeMenu !== 'undefined' && activeMenu === 'dashboard' ? 'active bg-primary rounded' : '' %>" href="/admin/dashboard">
+                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white <%= typeof activeMenu !== 'undefined' && activeMenu === 'kitchen' ? 'active bg-primary rounded' : '' %>" href="/admin/kitchen">
+                    <i class="fas fa-fire me-2"></i> Kitchen Display
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white <%= typeof activeMenu !== 'undefined' && activeMenu === 'orders' ? 'active bg-primary rounded' : '' %>" href="/admin/orders">
+                    <i class="fas fa-receipt me-2"></i> Pesanan
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white <%= typeof activeMenu !== 'undefined' && activeMenu === 'products' ? 'active bg-primary rounded' : '' %>" href="/admin/products">
+                    <i class="fas fa-mug-hot me-2"></i> Kelola Menu
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white <%= typeof activeMenu !== 'undefined' && activeMenu === 'categories' ? 'active bg-primary rounded' : '' %>" href="/admin/categories">
+                    <i class="fas fa-tags me-2"></i> Kategori
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white <%= typeof activeMenu !== 'undefined' && activeMenu === 'reports' ? 'active bg-primary rounded' : '' %>" href="/admin/reports">
+                    <i class="fas fa-chart-bar me-2"></i> Laporan
+                </a>
+            </li>
+            <% if (user && user.role === 'admin') { %>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white <%= typeof activeMenu !== 'undefined' && activeMenu === 'settings' ? 'active bg-primary rounded' : '' %>" href="/admin/settings">
+                    <i class="fas fa-cog me-2"></i> Pengaturan
+                </a>
+            </li>
+            <% } %>
+        </ul>
+    </nav>
+    
+    <div class="sidebar-footer p-3 border-top border-secondary mt-auto">
+        <div class="d-flex align-items-center text-white mb-2">
+            <i class="fas fa-user-circle me-2"></i>
+            <span><%= user ? user.fullName : 'Admin' %></span>
+        </div>
+        <a href="/admin/logout" class="btn btn-outline-light btn-sm w-100">
+            <i class="fas fa-sign-out-alt me-1"></i> Logout
+        </a>
+    </div>
+</div>

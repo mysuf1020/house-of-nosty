@@ -1,0 +1,80 @@
+<%- include('../partials/header') %>
+
+<div class="admin-wrapper d-flex">
+    <%- include('../partials/admin-sidebar', { activeMenu: 'products' }) %>
+    
+    <main class="admin-content flex-grow-1 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">Kelola Menu</h4>
+            <a href="/admin/products/add" class="btn btn-warning">
+                <i class="fas fa-plus me-1"></i>Tambah Menu
+            </a>
+        </div>
+        
+        <%- include('../partials/flash-messages') %>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Gambar</th>
+                                <th>Nama Menu</th>
+                                <th>Kategori</th>
+                                <th>Harga</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% products.forEach(product => { %>
+                            <tr>
+                                <td>
+                                    <img src="/uploads/menu/<%= product.image %>" alt="<%= product.name %>" 
+                                         class="rounded" style="width: 50px; height: 50px; object-fit: cover;"
+                                         onerror="this.src='/images/default-menu.jpg'">
+                                </td>
+                                <td><strong><%= product.name %></strong></td>
+                                <td><span class="badge bg-secondary"><%= product.category_name %></span></td>
+                                <td>Rp <%= product.price.toLocaleString('id-ID') %></td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input toggle-availability" type="checkbox" 
+                                               data-product-id="<%= product.id %>" 
+                                               <%= product.is_available ? 'checked' : '' %>>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="/admin/products/edit/<%= product.id %>" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="/admin/products/<%= product.id %>/delete" method="POST" class="d-inline" 
+                                          onsubmit="return confirm('Hapus menu ini?')">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                            <% if (products.length === 0) { %>
+                            <tr><td colspan="6" class="text-center text-muted py-4">Belum ada menu</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+document.querySelectorAll('.toggle-availability').forEach(toggle => {
+    toggle.addEventListener('change', function() {
+        fetch(`/admin/products/${this.dataset.productId}/toggle`, { method: 'POST' });
+    });
+});
+</script>
+
+<%- include('../partials/footer') %>

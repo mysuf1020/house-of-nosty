@@ -1,0 +1,100 @@
+<%- include('../partials/header') %>
+
+<div class="admin-wrapper d-flex">
+    <%- include('../partials/admin-sidebar', { activeMenu: 'kitchen' }) %>
+    
+    <main class="admin-content flex-grow-1 p-4 bg-dark min-vh-100">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0 text-white">
+                <i class="fas fa-fire text-warning me-2"></i>Kitchen Display
+            </h4>
+            <button class="btn btn-outline-light btn-sm" onclick="location.reload()">
+                <i class="fas fa-sync-alt me-1"></i>Refresh
+            </button>
+        </div>
+        
+        <% if (orders.length === 0) { %>
+        <div class="text-center py-5">
+            <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
+            <h5 class="text-white">Tidak ada pesanan aktif</h5>
+            <p class="text-muted">Semua pesanan sudah selesai diproses</p>
+        </div>
+        <% } else { %>
+        <div class="row g-3">
+            <% orders.forEach(order => { %>
+            <div class="col-md-4 col-lg-3">
+                <div class="card h-100 border-0 shadow <%= order.status === 'pending' ? 'border-start border-warning border-4' : 'border-start border-info border-4' %>">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge <%= order.status === 'pending' ? 'bg-warning text-dark' : 'bg-info' %> me-2">
+                                <%= order.status === 'pending' ? 'BARU' : 'MASAK' %>
+                            </span>
+                            <strong>Meja <%= order.table_number %></strong>
+                        </div>
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            <%= Math.floor((Date.now() - new Date(order.created_at).getTime()) / 60000) %> menit
+                        </small>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2"><strong><%= order.customer_name %></strong></p>
+                        <ul class="list-unstyled mb-0">
+                            <% order.items.forEach(item => { %>
+                            <li class="mb-2 pb-2 border-bottom">
+                                <div class="d-flex justify-content-between">
+                                    <span><strong><%= item.qty %>x</strong> <%= item.product_name %></span>
+                                </div>
+                                <% if (item.variant_info) { %>
+                                <small class="text-warning d-block"><i class="fas fa-tag me-1"></i><%= item.variant_info %></small>
+                                <% } %>
+                                <% if (item.notes) { %>
+                                <small class="text-info d-block"><i class="fas fa-sticky-note me-1"></i><%= item.notes %></small>
+                                <% } %>
+                            </li>
+                            <% }) %>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <% if (order.status === 'pending') { %>
+                        <button class="btn btn-info w-100 status-btn" data-order-id="<%= order.id %>" data-status="cooking">
+                            <i class="fas fa-fire me-1"></i>Proses
+                        </button>
+                        <% } else { %>
+                        <button class="btn btn-success w-100 status-btn" data-order-id="<%= order.id %>" data-status="served">
+                            <i class="fas fa-check me-1"></i>Selesai
+                        </button>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            <% }) %>
+        </div>
+        <% } %>
+    </main>
+</div>
+
+<script>
+document.querySelectorAll('.status-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const orderId = this.dataset.orderId;
+        const status = this.dataset.status;
+        
+        fetch(`/admin/orders/${orderId}/status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (result.success) {
+                location.reload();
+            }
+        });
+    });
+});
+
+// Auto refresh every 30 seconds
+setInterval(() => location.reload(), 30000);
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,361 @@
+/* =====================================================
+   House of Nosty - Custom Styles
+   Website Company Profile & E-Menu Interactive
+   ===================================================== */
+
+/* Base Styles */
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: #f8f9fa;
+}
+
+/* Navbar */
+.navbar {
+    transition: all 0.3s ease;
+}
+
+.navbar-brand {
+    font-size: 1.25rem;
+}
+
+/* Hero Section */
+.hero-section {
+    background-attachment: fixed;
+}
+
+/* Menu Card */
+.menu-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.menu-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+}
+
+.menu-card .card-img-wrapper {
+    height: 200px;
+    overflow: hidden;
+}
+
+.menu-card .card-img-top {
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.menu-card:hover .card-img-top {
+    transform: scale(1.1);
+}
+
+/* Icon Box */
+.icon-box {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Category Navigation (Mobile Menu) */
+.category-nav {
+    -webkit-overflow-scrolling: touch;
+}
+
+.category-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.category-scroll {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.category-btn.active {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+/* Menu Item (Mobile) */
+.menu-item {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.menu-item:active {
+    transform: scale(0.98);
+}
+
+.menu-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Floating Cart */
+.floating-cart {
+    z-index: 1050;
+    border-radius: 15px 15px 0 0;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+}
+
+/* Product Modal */
+.modal-dialog-bottom {
+    margin: 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 100%;
+}
+
+.modal-dialog-bottom .modal-content {
+    border-radius: 20px 20px 0 0;
+    border: none;
+}
+
+/* Variant Buttons */
+.btn-check:checked + .btn-outline-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #000;
+}
+
+/* Admin Layout */
+.admin-wrapper {
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 250px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+}
+
+.admin-sidebar .nav-link {
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+}
+
+.admin-sidebar .nav-link:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.admin-sidebar .nav-link.active {
+    background-color: #0d6efd !important;
+}
+
+.admin-content {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Kitchen Display Cards */
+.kitchen-card {
+    border-left: 4px solid;
+}
+
+.kitchen-card.pending {
+    border-left-color: #ffc107;
+}
+
+.kitchen-card.cooking {
+    border-left-color: #0dcaf0;
+}
+
+/* Status Timeline */
+.status-timeline .status-step {
+    flex: 1;
+}
+
+/* Form Switch */
+.form-check-input:checked {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+/* Table Hover */
+.table-hover tbody tr:hover {
+    background-color: rgba(255, 193, 7, 0.1);
+}
+
+/* Responsive Mobile */
+@media (max-width: 768px) {
+    .admin-sidebar {
+        display: none;
+    }
+    
+    .hero-section {
+        background-attachment: scroll;
+        min-height: 80vh !important;
+    }
+    
+    .hero-section h1 {
+        font-size: 2rem !important;
+    }
+    
+    .hero-section .lead {
+        font-size: 1rem;
+    }
+    
+    .menu-card .card-img-wrapper {
+        height: 150px;
+    }
+    
+    .display-4 {
+        font-size: 1.75rem !important;
+    }
+    
+    .display-3 {
+        font-size: 2rem !important;
+    }
+    
+    .btn-lg {
+        padding: 0.5rem 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .icon-box {
+        width: 40px !important;
+        height: 40px !important;
+    }
+    
+    .step-icon {
+        width: 60px !important;
+        height: 60px !important;
+    }
+    
+    .step-icon i {
+        font-size: 1.25rem !important;
+    }
+    
+    section {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+    
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    /* Mobile Menu Page */
+    .menu-item img {
+        width: 80px !important;
+        height: 80px !important;
+    }
+    
+    .floating-cart {
+        padding: 12px 15px !important;
+    }
+    
+    /* Mobile Cart */
+    .cart-item img {
+        width: 60px !important;
+        height: 60px !important;
+    }
+    
+    /* Footer Mobile */
+    footer .row > div {
+        text-align: center !important;
+    }
+    
+    footer .d-flex {
+        justify-content: center !important;
+    }
+}
+
+/* Extra Small Devices */
+@media (max-width: 576px) {
+    .hero-section {
+        min-height: 70vh !important;
+    }
+    
+    .hero-section h1 {
+        font-size: 1.75rem !important;
+    }
+    
+    .navbar-brand {
+        font-size: 1rem !important;
+    }
+    
+    .btn-lg {
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .card-body {
+        padding: 0.75rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    h5 {
+        font-size: 1rem;
+    }
+    
+    .menu-item {
+        padding: 10px !important;
+    }
+    
+    .menu-item img {
+        width: 70px !important;
+        height: 70px !important;
+    }
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* Toast Notification */
+.toast-notification {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Loading Spinner */
+.spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255,255,255,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+/* Print Styles */
+@media print {
+    .admin-sidebar,
+    .btn,
+    .no-print {
+        display: none !important;
+    }
+}

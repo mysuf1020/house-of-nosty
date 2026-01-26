@@ -1,0 +1,63 @@
+<%- include('../partials/header') %>
+
+<div class="admin-wrapper d-flex">
+    <%- include('../partials/admin-sidebar', { activeMenu: 'settings' }) %>
+    
+    <main class="admin-content flex-grow-1 p-4">
+        <h4 class="fw-bold mb-4">Pengaturan Company Profile</h4>
+        
+        <%- include('../partials/flash-messages') %>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <form action="/admin/settings" method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nama Coffee Shop</label>
+                            <input type="text" class="form-control" name="name" value="<%= company.name || '' %>">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tagline</label>
+                            <input type="text" class="form-control" name="tagline" value="<%= company.tagline || '' %>">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Deskripsi</label>
+                        <textarea class="form-control" name="description" rows="3"><%= company.description || '' %></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Alamat</label>
+                        <input type="text" class="form-control" name="address" value="<%= company.address || '' %>">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Telepon</label>
+                            <input type="text" class="form-control" name="phone" value="<%= company.phone || '' %>">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" value="<%= company.email || '' %>">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Instagram</label>
+                            <input type="text" class="form-control" name="instagram" value="<%= company.instagram || '' %>">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Jam Operasional</label>
+                            <input type="text" class="form-control" name="opening_hours" value="<%= company.opening_hours || '' %>">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password WiFi</label>
+                        <input type="text" class="form-control" name="wifi_password" value="<%= company.wifi_password || '' %>">
+                    </div>
+                    <button type="submit" class="btn btn-warning"><i class="fas fa-save me-1"></i>Simpan Pengaturan</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<%- include('../partials/footer') %>

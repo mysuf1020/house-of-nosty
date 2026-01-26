@@ -1,0 +1,140 @@
+<%- include('../partials/header') %>
+
+<div class="admin-wrapper d-flex">
+    <%- include('../partials/admin-sidebar', { activeMenu: 'dashboard' }) %>
+    
+    <main class="admin-content flex-grow-1 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">Dashboard</h4>
+            <span class="text-muted"><%= new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+        </div>
+        
+        <%- include('../partials/flash-messages') %>
+        
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-warning text-dark">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Pesanan Hari Ini</h6>
+                                <h2 class="fw-bold mb-0"><%= stats.todayOrders %></h2>
+                            </div>
+                            <i class="fas fa-receipt fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Pendapatan Hari Ini</h6>
+                                <h2 class="fw-bold mb-0">Rp <%= stats.todayRevenue.toLocaleString('id-ID') %></h2>
+                            </div>
+                            <i class="fas fa-money-bill-wave fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-danger text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Pesanan Pending</h6>
+                                <h2 class="fw-bold mb-0"><%= stats.pendingOrders %></h2>
+                            </div>
+                            <i class="fas fa-clock fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm bg-info text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Total Menu</h6>
+                                <h2 class="fw-bold mb-0"><%= stats.totalProducts %></h2>
+                            </div>
+                            <i class="fas fa-mug-hot fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0">
+                        <h6 class="fw-bold mb-0">Aksi Cepat</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="/admin/kitchen" class="btn btn-warning">
+                                <i class="fas fa-fire me-1"></i>Kitchen Display
+                            </a>
+                            <a href="/admin/products/add" class="btn btn-outline-primary">
+                                <i class="fas fa-plus me-1"></i>Tambah Menu
+                            </a>
+                            <a href="/admin/orders" class="btn btn-outline-secondary">
+                                <i class="fas fa-list me-1"></i>Semua Pesanan
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0">
+                        <h6 class="fw-bold mb-0">Pesanan Terbaru</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>No. Pesanan</th>
+                                        <th>Meja</th>
+                                        <th>Status</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% recentOrders.forEach(order => { %>
+                                    <tr>
+                                        <td><a href="/admin/orders/<%= order.id %>"><%= order.order_number %></a></td>
+                                        <td><%= order.table_number %></td>
+                                        <td>
+                                            <% if (order.status === 'pending') { %>
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                            <% } else if (order.status === 'cooking') { %>
+                                            <span class="badge bg-info">Dimasak</span>
+                                            <% } else if (order.status === 'served') { %>
+                                            <span class="badge bg-success">Diantar</span>
+                                            <% } else if (order.status === 'paid') { %>
+                                            <span class="badge bg-secondary">Lunas</span>
+                                            <% } %>
+                                        </td>
+                                        <td>Rp <%= order.total_price.toLocaleString('id-ID') %></td>
+                                    </tr>
+                                    <% }) %>
+                                    <% if (recentOrders.length === 0) { %>
+                                    <tr><td colspan="4" class="text-center text-muted">Belum ada pesanan</td></tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<%- include('../partials/footer') %>

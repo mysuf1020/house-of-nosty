@@ -1,0 +1,306 @@
+<%- include('../partials/header') %>
+
+<!-- Mobile Menu Header -->
+<header class="menu-header bg-dark text-white py-3 sticky-top">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="/" class="text-white text-decoration-none">
+                <i class="fas fa-coffee me-2"></i>
+                <span class="fw-bold">House of Nosty</span>
+            </a>
+            <% if (tableNumber) { %>
+            <span class="badge bg-warning text-dark">
+                <i class="fas fa-chair me-1"></i>Meja <%= tableNumber %>
+            </span>
+            <% } %>
+        </div>
+    </div>
+</header>
+
+<!-- Flash Messages -->
+<div class="container mt-3">
+    <%- include('../partials/flash-messages') %>
+</div>
+
+<!-- Category Navigation (Sticky) -->
+<nav class="category-nav bg-white shadow-sm sticky-top" style="top: 56px; z-index: 1000;">
+    <div class="container">
+        <div class="category-scroll d-flex overflow-auto py-2 gap-2">
+            <% categories.forEach(cat => { %>
+            <a href="#category-<%= cat.id %>" class="btn btn-outline-dark btn-sm rounded-pill flex-shrink-0 category-btn">
+                <i class="fas <%= cat.icon %> me-1"></i><%= cat.name %>
+            </a>
+            <% }) %>
+        </div>
+    </div>
+</nav>
+
+<!-- Menu List -->
+<main class="menu-content pb-5 mb-5">
+    <div class="container py-3">
+        <% Object.values(menuByCategory).forEach(group => { %>
+        <section id="category-<%= group.category.id %>" class="menu-category mb-4">
+            <h5 class="fw-bold mb-3 text-dark">
+                <i class="fas <%= group.category.icon %> text-warning me-2"></i>
+                <%= group.category.name %>
+            </h5>
+            
+            <div class="menu-items">
+                <% group.items.forEach(item => { %>
+                <div class="menu-item card mb-2 border-0 shadow-sm <%= !item.is_available ? 'opacity-50' : '' %>" 
+                     data-product-id="<%= item.id %>"
+                     data-available="<%= item.is_available %>">
+                    <div class="card-body p-2">
+                        <div class="d-flex">
+                            <div class="menu-item-img me-3">
+                                <img src="/uploads/menu/<%= item.image %>" alt="<%= item.name %>" 
+                                     class="rounded" style="width: 80px; height: 80px; object-fit: cover;"
+                                     onerror="this.src='/images/default-menu.jpg'">
+                            </div>
+                            <div class="menu-item-info flex-grow-1">
+                                <h6 class="mb-1 fw-bold"><%= item.name %></h6>
+                                <p class="text-muted small mb-1 menu-desc"><%= item.description ? item.description.substring(0, 50) : '' %></p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-warning fw-bold">Rp <%= item.price.toLocaleString('id-ID') %></span>
+                                    <% if (item.is_available) { %>
+                                    <button class="btn btn-warning btn-sm rounded-pill add-to-cart-btn"
+                                            data-product='<%- JSON.stringify(item) %>'>
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                    <% } else { %>
+                                    <span class="badge bg-secondary">Habis</span>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+        </section>
+        <% }) %>
+    </div>
+</main>
+
+<!-- Floating Cart Button -->
+<div class="floating-cart fixed-bottom bg-dark text-white p-3" id="floatingCart" style="display: none;">
+    <div class="container">
+        <a href="/cart" class="d-flex justify-content-between align-items-center text-white text-decoration-none">
+            <div>
+                <i class="fas fa-shopping-cart me-2"></i>
+                <span id="cartItemCount">0</span> Item
+            </div>
+            <div class="fw-bold">
+                Rp <span id="cartTotal">0</span>
+            </div>
+            <div>
+                <span class="btn btn-warning btn-sm">Lihat Keranjang</span>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Product Modal -->
+<div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-bottom modal-fullscreen-sm-down">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold" id="modalProductName">Nama Menu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <img id="modalProductImage" src="" alt="" class="img-fluid rounded" style="max-height: 200px;">
+                </div>
+                <p class="text-muted" id="modalProductDesc"></p>
+                <p class="h5 text-warning fw-bold mb-4">Rp <span id="modalProductPrice">0</span></p>
+                
+                <form id="addToCartForm">
+                    <input type="hidden" id="modalProductId" name="productId">
+                    
+                    <!-- Temperature Option -->
+                    <div class="variant-group mb-3" id="temperatureGroup" style="display: none;">
+                        <label class="form-label fw-bold">Suhu</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="temperature" id="tempHot" value="Hot">
+                            <label class="btn btn-outline-warning" for="tempHot">
+                                <i class="fas fa-mug-hot me-1"></i>Hot
+                            </label>
+                            <input type="radio" class="btn-check" name="temperature" id="tempIce" value="Ice" checked>
+                            <label class="btn btn-outline-warning" for="tempIce">
+                                <i class="fas fa-snowflake me-1"></i>Ice
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Sugar Option -->
+                    <div class="variant-group mb-3" id="sugarGroup" style="display: none;">
+                        <label class="form-label fw-bold">Level Gula</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="sugar" id="sugarNormal" value="Normal" checked>
+                            <label class="btn btn-outline-warning" for="sugarNormal">Normal</label>
+                            <input type="radio" class="btn-check" name="sugar" id="sugarLess" value="Less Sugar">
+                            <label class="btn btn-outline-warning" for="sugarLess">Less</label>
+                            <input type="radio" class="btn-check" name="sugar" id="sugarNo" value="No Sugar">
+                            <label class="btn btn-outline-warning" for="sugarNo">No</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Size Option -->
+                    <div class="variant-group mb-3" id="sizeGroup" style="display: none;">
+                        <label class="form-label fw-bold">Ukuran</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="size" id="sizeRegular" value="Regular" checked>
+                            <label class="btn btn-outline-warning" for="sizeRegular">Regular</label>
+                            <input type="radio" class="btn-check" name="size" id="sizeLarge" value="Large">
+                            <label class="btn btn-outline-warning" for="sizeLarge">Large (+Rp <span id="largePriceAdd">5.000</span>)</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Notes -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Catatan (Opsional)</label>
+                        <input type="text" class="form-control" name="notes" placeholder="Contoh: Extra shot, less ice...">
+                    </div>
+                    
+                    <!-- Quantity -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Jumlah</label>
+                        <div class="input-group" style="width: 150px;">
+                            <button type="button" class="btn btn-outline-secondary qty-btn" data-action="minus">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number" class="form-control text-center" name="qty" value="1" min="1" max="99" readonly>
+                            <button type="button" class="btn btn-outline-secondary qty-btn" data-action="plus">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-warning w-100 btn-lg" id="addToCartBtn">
+                    <i class="fas fa-cart-plus me-2"></i>Tambah ke Keranjang
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const productModal = new bootstrap.Modal(document.getElementById('productModal'));
+    let currentProduct = null;
+    
+    // Update cart display
+    function updateCartDisplay() {
+        fetch('/cart/data')
+            .then(res => res.json())
+            .then(data => {
+                const floatingCart = document.getElementById('floatingCart');
+                if (data.itemCount > 0) {
+                    floatingCart.style.display = 'block';
+                    document.getElementById('cartItemCount').textContent = data.itemCount;
+                    document.getElementById('cartTotal').textContent = data.total.toLocaleString('id-ID');
+                } else {
+                    floatingCart.style.display = 'none';
+                }
+            });
+    }
+    
+    // Initial cart update
+    updateCartDisplay();
+    
+    // Add to cart button click
+    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            currentProduct = JSON.parse(this.dataset.product);
+            
+            document.getElementById('modalProductId').value = currentProduct.id;
+            document.getElementById('modalProductName').textContent = currentProduct.name;
+            document.getElementById('modalProductDesc').textContent = currentProduct.description || '';
+            document.getElementById('modalProductPrice').textContent = currentProduct.price.toLocaleString('id-ID');
+            document.getElementById('modalProductImage').src = '/uploads/menu/' + currentProduct.image;
+            
+            // Show/hide variant options
+            document.getElementById('temperatureGroup').style.display = currentProduct.has_temperature_option ? 'block' : 'none';
+            document.getElementById('sugarGroup').style.display = currentProduct.has_sugar_option ? 'block' : 'none';
+            document.getElementById('sizeGroup').style.display = currentProduct.has_size_option ? 'block' : 'none';
+            document.getElementById('largePriceAdd').textContent = (currentProduct.large_price_add || 5000).toLocaleString('id-ID');
+            
+            // Reset form
+            document.querySelector('input[name="qty"]').value = 1;
+            document.querySelector('input[name="notes"]').value = '';
+            
+            productModal.show();
+        });
+    });
+    
+    // Quantity buttons
+    document.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const input = document.querySelector('input[name="qty"]');
+            let val = parseInt(input.value);
+            if (this.dataset.action === 'plus') {
+                input.value = Math.min(val + 1, 99);
+            } else {
+                input.value = Math.max(val - 1, 1);
+            }
+        });
+    });
+    
+    // Add to cart submit
+    document.getElementById('addToCartBtn').addEventListener('click', function() {
+        const form = document.getElementById('addToCartForm');
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (result.success) {
+                productModal.hide();
+                updateCartDisplay();
+                // Show toast
+                showToast('Berhasil ditambahkan ke keranjang!');
+            } else {
+                alert(result.error || 'Terjadi kesalahan');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Terjadi kesalahan');
+        });
+    });
+    
+    // Smooth scroll for category navigation
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                const offset = 120;
+                const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                window.scrollTo({ top, behavior: 'smooth' });
+            }
+        });
+    });
+    
+    // Toast function
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'position-fixed bottom-0 start-50 translate-middle-x mb-5 p-3 bg-success text-white rounded shadow';
+        toast.style.zIndex = '9999';
+        toast.innerHTML = '<i class="fas fa-check-circle me-2"></i>' + message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    }
+});
+</script>
+
+<%- include('../partials/footer') %>

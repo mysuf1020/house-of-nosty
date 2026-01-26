@@ -1,0 +1,274 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<!-- Hero Section -->
+<section class="hero-section d-flex align-items-center" style="min-height: 100vh; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/images/hero-bg.jpg') center/cover;">
+    <div class="container text-center text-white">
+        <h1 class="display-3 fw-bold mb-3"><%= company.name || 'House of Nosty' %></h1>
+        <p class="lead mb-4"><%= company.tagline || 'Your Cozy Coffee Destination' %></p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="/menu" class="btn btn-warning btn-lg px-5">
+                <i class="fas fa-book-open me-2"></i>Lihat Menu
+            </a>
+            <a href="/about" class="btn btn-outline-light btn-lg px-5">
+                <i class="fas fa-info-circle me-2"></i>Tentang Kami
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- About Preview Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <img src="/images/about-preview.jpg" alt="About House of Nosty" class="img-fluid rounded-3 shadow">
+            </div>
+            <div class="col-lg-6">
+                <h2 class="fw-bold mb-3">Selamat Datang di <span class="text-warning">House of Nosty</span></h2>
+                <p class="text-muted mb-4">
+                    <%= company.description || 'House of Nosty adalah coffee shop yang menghadirkan pengalaman ngopi yang nyaman dan memorable. Dengan konsep modern dan menu berkualitas, kami siap menemani hari-harimu.' %>
+                </p>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-warning text-dark rounded-circle p-3 me-3">
+                                <i class="fas fa-coffee"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Kopi Premium</h6>
+                                <small class="text-muted">Biji kopi pilihan</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-warning text-dark rounded-circle p-3 me-3">
+                                <i class="fas fa-wifi"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Free WiFi</h6>
+                                <small class="text-muted">Internet cepat</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-warning text-dark rounded-circle p-3 me-3">
+                                <i class="fas fa-couch"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Tempat Nyaman</h6>
+                                <small class="text-muted">Suasana cozy</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-warning text-dark rounded-circle p-3 me-3">
+                                <i class="fas fa-qrcode"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Self Order</h6>
+                                <small class="text-muted">Pesan via HP</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Menu Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Menu <span class="text-warning">Favorit</span></h2>
+            <p class="text-muted">Pilihan menu terbaik dari kami</p>
+        </div>
+        
+        <div class="row g-4">
+            <% products.forEach(product => { %>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm menu-card">
+                    <div class="card-img-wrapper">
+                        <img src="/uploads/menu/<%= product.image %>" class="card-img-top" alt="<%= product.name %>" 
+                             onerror="this.src='/images/default-menu.jpg'">
+                        <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">
+                            <%= product.category_name %>
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold"><%= product.name %></h5>
+                        <p class="card-text text-muted small"><%= product.description ? product.description.substring(0, 60) + '...' : '' %></p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="h5 text-warning mb-0">Rp <%= product.price.toLocaleString('id-ID') %></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% }) %>
+        </div>
+        
+        <div class="text-center mt-5">
+            <a href="/menu" class="btn btn-warning btn-lg px-5">
+                <i class="fas fa-book-open me-2"></i>Lihat Semua Menu
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- How to Order Section -->
+<section class="py-5 bg-dark text-white">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Cara <span class="text-warning">Pesan</span></h2>
+            <p class="text-muted">Pesan menu favoritmu dengan mudah</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-3 text-center">
+                <div class="step-icon bg-warning text-dark rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                    <i class="fas fa-qrcode fa-2x"></i>
+                </div>
+                <h5>1. Scan QR Code</h5>
+                <p class="text-muted small">Scan QR Code yang ada di meja</p>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="step-icon bg-warning text-dark rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                    <i class="fas fa-hand-pointer fa-2x"></i>
+                </div>
+                <h5>2. Pilih Menu</h5>
+                <p class="text-muted small">Pilih menu dan varian sesuai selera</p>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="step-icon bg-warning text-dark rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                    <i class="fas fa-paper-plane fa-2x"></i>
+                </div>
+                <h5>3. Kirim Pesanan</h5>
+                <p class="text-muted small">Konfirmasi dan kirim pesananmu</p>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="step-icon bg-warning text-dark rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                    <i class="fas fa-mug-hot fa-2x"></i>
+                </div>
+                <h5>4. Nikmati!</h5>
+                <p class="text-muted small">Tunggu pesanan diantar ke meja</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Online Order Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Pesan <span class="text-warning">Online</span></h2>
+            <p class="text-muted">Pesan dari rumah, kami antar ke tempatmu!</p>
+        </div>
+        <div class="row justify-content-center g-4">
+            <div class="col-md-4 col-lg-3">
+                <a href="https://gofood.co.id/jakarta/restaurant/house-of-nosty-cadas-53e5543c-94c6-4866-8a8b-020c298c0197" target="_blank" class="card h-100 border-0 shadow-sm text-decoration-none text-center p-4" style="transition: transform 0.3s;">
+                    <div class="card-body">
+                        <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; background-color: #00AA13;">
+                            <i class="fas fa-motorcycle fa-2x text-white"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark">GoFood</h5>
+                        <p class="text-muted small mb-0">Pesan via GoFood</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <a href="https://www.grab.com/id/download/?pid=inappsharing&c=6-C4EBVKKCWE2ETJ" target="_blank" class="card h-100 border-0 shadow-sm text-decoration-none text-center p-4" style="transition: transform 0.3s;">
+                    <div class="card-body">
+                        <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; background-color: #00B14F;">
+                            <i class="fas fa-motorcycle fa-2x text-white"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark">GrabFood</h5>
+                        <p class="text-muted small mb-0">Pesan via GrabFood</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <a href="https://api.whatsapp.com/send/?phone=6285173390789&text=Halo%20House%20of%20Nosty!%20Saya%20mau%20pesan" target="_blank" class="card h-100 border-0 shadow-sm text-decoration-none text-center p-4" style="transition: transform 0.3s;">
+                    <div class="card-body">
+                        <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; background-color: #25D366;">
+                            <i class="fab fa-whatsapp fa-2x text-white"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark">WhatsApp</h5>
+                        <p class="text-muted small mb-0">Chat langsung</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Preview Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h2 class="fw-bold mb-4">Kunjungi <span class="text-warning">Kami</span></h2>
+                <div class="mb-3">
+                    <i class="fas fa-map-marker-alt text-warning me-3"></i>
+                    <span><%= company.address || 'Jl. Cadas, Jakarta' %></span>
+                </div>
+                <div class="mb-3">
+                    <i class="fab fa-whatsapp text-warning me-3"></i>
+                    <span><%= company.phone || '+62 851-7339-0789' %></span>
+                </div>
+                <div class="mb-3">
+                    <i class="fab fa-instagram text-warning me-3"></i>
+                    <a href="https://www.instagram.com/houseofnosty/" target="_blank" class="text-dark text-decoration-none"><%= company.instagram || '@houseofnosty' %></a>
+                </div>
+                <div class="mb-3">
+                    <i class="fab fa-tiktok text-warning me-3"></i>
+                    <a href="https://www.tiktok.com/@houseofnosty" target="_blank" class="text-dark text-decoration-none">@houseofnosty</a>
+                </div>
+                <div class="mb-4">
+                    <i class="fas fa-clock text-warning me-3"></i>
+                    <span><%= company.opening_hours || 'Senin - Minggu: 08:00 - 22:00' %></span>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="https://maps.app.goo.gl/GV8hB5opxGFm445k7" target="_blank" class="btn btn-warning">
+                        <i class="fas fa-map-marked-alt me-2"></i>Lihat di Maps
+                    </a>
+                    <a href="/contact" class="btn btn-outline-dark">
+                        <i class="fas fa-envelope me-2"></i>Hubungi Kami
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="ratio ratio-16x9 rounded-3 overflow-hidden shadow">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.2!2d106.85!3d-6.25!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMTUnMDAuMCJTIDEwNsKwNTEnMDAuMCJF!5e0!3m2!1sen!2sid!4v1" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-dark text-white py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <h5 class="fw-bold text-warning">House of Nosty</h5>
+                <p class="small mb-0">Your Cozy Coffee Destination</p>
+            </div>
+            <div class="col-md-4 mb-3 mb-md-0 text-center">
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="https://www.instagram.com/houseofnosty/" target="_blank" class="text-white"><i class="fab fa-instagram fa-lg"></i></a>
+                    <a href="https://www.tiktok.com/@houseofnosty" target="_blank" class="text-white"><i class="fab fa-tiktok fa-lg"></i></a>
+                    <a href="https://api.whatsapp.com/send/?phone=6285173390789" target="_blank" class="text-white"><i class="fab fa-whatsapp fa-lg"></i></a>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <p class="small mb-0">&copy; 2024 House of Nosty. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<%- include('../partials/footer') %>

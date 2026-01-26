@@ -1,0 +1,94 @@
+<%- include('../partials/header') %>
+
+<!-- Header -->
+<header class="bg-dark text-white py-3">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="/cart" class="text-white text-decoration-none">
+                <i class="fas fa-arrow-left me-2"></i>Kembali
+            </a>
+            <h5 class="mb-0 fw-bold">Checkout</h5>
+            <span></span>
+        </div>
+    </div>
+</header>
+
+<main class="container py-4 pb-5 mb-5">
+    <%- include('../partials/flash-messages') %>
+    
+    <form action="/order/place" method="POST" id="checkoutForm">
+        <!-- Customer Info -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3"><i class="fas fa-user me-2 text-warning"></i>Informasi Pemesan</h6>
+                
+                <div class="mb-3">
+                    <label class="form-label">Nama Pemesan <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="customerName" required placeholder="Masukkan nama Anda">
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Nomor Meja <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="tableNumber" value="<%= tableNumber || '' %>" 
+                           required placeholder="Contoh: 5" <%= tableNumber ? 'readonly' : '' %>>
+                    <% if (tableNumber) { %>
+                    <small class="text-muted">Nomor meja terdeteksi dari QR Code</small>
+                    <% } %>
+                </div>
+                
+                <div class="mb-0">
+                    <label class="form-label">Catatan Tambahan (Opsional)</label>
+                    <textarea class="form-control" name="notes" rows="2" placeholder="Catatan untuk pesanan..."></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Summary -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3"><i class="fas fa-receipt me-2 text-warning"></i>Ringkasan Pesanan</h6>
+                
+                <% cart.forEach(item => { %>
+                <div class="d-flex justify-content-between align-items-start mb-2 pb-2 border-bottom">
+                    <div>
+                        <span class="fw-bold"><%= item.qty %>x</span> <%= item.name %>
+                        <% if (item.variantInfo) { %>
+                        <br><small class="text-muted"><%= item.variantInfo %></small>
+                        <% } %>
+                    </div>
+                    <span>Rp <%= (item.price * item.qty).toLocaleString('id-ID') %></span>
+                </div>
+                <% }) %>
+                
+                <div class="d-flex justify-content-between mt-3 pt-2">
+                    <span class="fw-bold h5 mb-0">Total</span>
+                    <span class="fw-bold text-warning h5 mb-0">Rp <%= total.toLocaleString('id-ID') %></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Payment Info -->
+        <div class="card border-0 shadow-sm mb-4 bg-light">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-info-circle text-warning fa-2x me-3"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1">Pembayaran di Kasir</h6>
+                        <small class="text-muted">Setelah pesanan selesai, silakan bayar langsung di kasir.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</main>
+
+<!-- Submit Button -->
+<div class="fixed-bottom bg-white p-3 shadow-lg">
+    <div class="container">
+        <button type="submit" form="checkoutForm" class="btn btn-warning btn-lg w-100">
+            <i class="fas fa-paper-plane me-2"></i>Pesan Sekarang
+        </button>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,130 @@
+<%- include('../partials/header') %>
+
+<!-- Header -->
+<header class="bg-dark text-white py-3">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="/menu" class="text-white text-decoration-none">
+                <i class="fas fa-arrow-left me-2"></i>Menu
+            </a>
+            <h5 class="mb-0 fw-bold">Status Pesanan</h5>
+            <span></span>
+        </div>
+    </div>
+</header>
+
+<main class="container py-4">
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <small class="text-muted">Nomor Pesanan</small>
+                    <h5 class="fw-bold text-warning mb-0"><%= order.order_number %></h5>
+                </div>
+                <div class="text-end">
+                    <small class="text-muted">Meja</small>
+                    <h5 class="fw-bold mb-0"><%= order.table_number %></h5>
+                </div>
+            </div>
+            
+            <!-- Status Timeline -->
+            <div class="status-timeline py-4">
+                <div class="d-flex justify-content-between position-relative">
+                    <div class="status-line position-absolute" style="top: 15px; left: 10%; right: 10%; height: 3px; background: #e9ecef; z-index: 0;"></div>
+                    
+                    <div class="status-step text-center" style="z-index: 1;">
+                        <div class="status-icon rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 
+                            <%= ['pending', 'cooking', 'served', 'paid'].includes(order.status) ? 'bg-success text-white' : 'bg-light text-muted' %>" 
+                            style="width: 40px; height: 40px;">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <small class="d-block">Diterima</small>
+                    </div>
+                    
+                    <div class="status-step text-center" style="z-index: 1;">
+                        <div class="status-icon rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 
+                            <%= ['cooking', 'served', 'paid'].includes(order.status) ? 'bg-success text-white' : 'bg-light text-muted' %>" 
+                            style="width: 40px; height: 40px;">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <small class="d-block">Dimasak</small>
+                    </div>
+                    
+                    <div class="status-step text-center" style="z-index: 1;">
+                        <div class="status-icon rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 
+                            <%= ['served', 'paid'].includes(order.status) ? 'bg-success text-white' : 'bg-light text-muted' %>" 
+                            style="width: 40px; height: 40px;">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <small class="d-block">Diantar</small>
+                    </div>
+                    
+                    <div class="status-step text-center" style="z-index: 1;">
+                        <div class="status-icon rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 
+                            <%= order.status === 'paid' ? 'bg-success text-white' : 'bg-light text-muted' %>" 
+                            style="width: 40px; height: 40px;">
+                            <i class="fas fa-money-bill"></i>
+                        </div>
+                        <small class="d-block">Lunas</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <% if (order.status === 'pending') { %>
+                <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                    <i class="fas fa-clock me-1"></i>Menunggu Konfirmasi
+                </span>
+                <% } else if (order.status === 'cooking') { %>
+                <span class="badge bg-info text-white fs-6 px-3 py-2">
+                    <i class="fas fa-fire me-1"></i>Sedang Dimasak
+                </span>
+                <% } else if (order.status === 'served') { %>
+                <span class="badge bg-success fs-6 px-3 py-2">
+                    <i class="fas fa-check me-1"></i>Sudah Diantar
+                </span>
+                <% } else if (order.status === 'paid') { %>
+                <span class="badge bg-secondary fs-6 px-3 py-2">
+                    <i class="fas fa-check-double me-1"></i>Selesai
+                </span>
+                <% } else if (order.status === 'cancelled') { %>
+                <span class="badge bg-danger fs-6 px-3 py-2">
+                    <i class="fas fa-times me-1"></i>Dibatalkan
+                </span>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Order Items -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h6 class="fw-bold mb-3">Detail Pesanan</h6>
+            
+            <% items.forEach(item => { %>
+            <div class="d-flex justify-content-between align-items-start mb-2 pb-2 border-bottom">
+                <div>
+                    <span class="fw-bold"><%= item.qty %>x</span> <%= item.product_name %>
+                    <% if (item.variant_info) { %>
+                    <br><small class="text-muted"><%= item.variant_info %></small>
+                    <% } %>
+                </div>
+                <span>Rp <%= (item.price_at_order * item.qty).toLocaleString('id-ID') %></span>
+            </div>
+            <% }) %>
+            
+            <div class="d-flex justify-content-between mt-3 pt-2">
+                <span class="fw-bold">Total</span>
+                <span class="fw-bold text-warning h5 mb-0">Rp <%= order.total_price.toLocaleString('id-ID') %></span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center">
+        <a href="/menu" class="btn btn-warning">
+            <i class="fas fa-plus me-2"></i>Pesan Lagi
+        </a>
+    </div>
+</main>
+
+<%- include('../partials/footer') %>
