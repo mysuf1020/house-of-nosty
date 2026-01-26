@@ -181,8 +181,8 @@
                                     <small class="text-muted ms-1">(<%= percentage %>%)</small>
                                 </span>
                             </div>
-                            <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-<%= config.color %>" style="width: <%= percentage %>%"></div>
+                            <div class="progress" style="height: 8px">
+                                <div class="progress-bar bg-<%= config.color %>" data-width="<%= percentage %>" style="width: 0%"></div>
                             </div>
                         </div>
                         <% }) %>
@@ -203,5 +203,13 @@
         </div>
     </main>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.progress-bar[data-width]').forEach(function(bar) {
+        bar.style.width = bar.dataset.width + '%';
+    });
+});
+</script>
 
 <%- include('../partials/footer') %>
