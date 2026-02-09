@@ -28,12 +28,17 @@
                 </div>
                 
                 <div class="mb-3">
-                    <label class="form-label">Nomor Meja <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="tableNumber" value="<%= tableNumber || '' %>" 
-                           required placeholder="Contoh: 5" <%= tableNumber ? 'readonly' : '' %>>
-                    <% if (tableNumber) { %>
-                    <small class="text-muted">Nomor meja terdeteksi dari QR Code</small>
-                    <% } %>
+                    <label class="form-label">Nomor Meja</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-warning text-dark">
+                            <i class="fas fa-chair"></i>
+                        </span>
+                        <input type="text" class="form-control bg-light" value="Meja <%= tableNumber %>" readonly>
+                        <span class="input-group-text bg-success text-white">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                    </div>
+                    <small class="text-success"><i class="fas fa-check-circle me-1"></i>Nomor meja terkunci dari QR Code</small>
                 </div>
                 
                 <div class="mb-0">

@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const path = require('path');
+const QRCode = require('qrcode');
 const db = require('../config/database');
 const { isAuthenticated, isAdmin, isKasirOrAdmin, isStaff, isNotAuthenticated } = require('../middleware/auth');
 
@@ -770,6 +771,62 @@ router.get('/logs', isAuthenticated, isAdmin, async (req, res) => {
     } catch (error) {
         console.error(error);
         res.render('error', { title: 'Error', message: 'Terjadi kesalahan' });
+    }
+});
+
+// ==================== QR CODE MANAGEMENT ====================
+
+// QR Code generator page
+router.get('/qrcodes', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+        const totalTables = 20; // Default 20 meja
+        const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+        
+        const tables = [];
+        for (let i = 1; i <= totalTables; i++) {
+            const menuUrl = `${baseUrl}/menu?meja=${i}`;
+            const qrDataUrl = await QRCode.toDataURL(menuUrl, {
+                width: 300,
+                margin: 2,
+                color: { dark: '#000000', light: '#ffffff' }
+            });
+            tables.push({
+                number: i,
+                url: menuUrl,
+                qrCode: qrDataUrl
+            });
+        }
+        
+        res.render('admin/qrcodes', {
+            title: 'QR Code Meja - Admin House of Nosty',
+            tables,
+            baseUrl
+        });
+    } catch (error) {
+        console.error(error);
+        res.render('error', { title: 'Error', message: 'Terjadi kesalahan' });
+    }
+});
+
+// Generate single QR code as image download
+router.get('/qrcodes/:tableNumber/download', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+        const tableNumber = req.params.tableNumber;
+        const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+        const menuUrl = `${baseUrl}/menu?meja=${tableNumber}`;
+        
+        const qrBuffer = await QRCode.toBuffer(menuUrl, {
+            width: 500,
+            margin: 2,
+            color: { dark: '#000000', light: '#ffffff' }
+        });
+        
+        res.setHeader('Content-Type', 'image/png');
+        res.setHeader('Content-Disposition', `attachment; filename=qr-meja-${tableNumber}.png`);
+        res.send(qrBuffer);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Gagal generate QR code' });
     }
 });
 

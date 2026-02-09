@@ -17,6 +17,12 @@ router.get('/checkout', (req, res) => {
         return res.redirect('/menu');
     }
     
+    // Require table number from QR scan
+    if (!req.session.tableNumber) {
+        req.flash('error_msg', 'Silakan scan QR Code di meja Anda terlebih dahulu');
+        return res.redirect('/menu');
+    }
+    
     const cart = req.session.cart;
     const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     
@@ -24,7 +30,8 @@ router.get('/checkout', (req, res) => {
         title: 'Checkout - House of Nosty',
         cart,
         total,
-        tableNumber: req.session.tableNumber
+        tableNumber: req.session.tableNumber,
+        tableNumberLocked: req.session.tableNumberLocked || false
     });
 });
 
@@ -35,15 +42,22 @@ router.post('/place', async (req, res) => {
     try {
         await connection.beginTransaction();
         
-        const { customerName, tableNumber, notes } = req.body;
+        const { customerName, notes } = req.body;
         const cart = req.session.cart;
+        
+        // Use locked table number from session (from QR scan)
+        const tableNumber = req.session.tableNumber;
         
         if (!cart || cart.length === 0) {
             throw new Error('Keranjang kosong');
         }
         
-        if (!customerName || !tableNumber) {
-            throw new Error('Nama dan nomor meja wajib diisi');
+        if (!customerName) {
+            throw new Error('Nama wajib diisi');
+        }
+        
+        if (!tableNumber) {
+            throw new Error('Silakan scan QR Code di meja Anda terlebih dahulu');
         }
         
         const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);

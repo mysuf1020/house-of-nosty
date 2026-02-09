@@ -5,10 +5,17 @@ const db = require('../config/database');
 // Menu Page - Customer View
 router.get('/', async (req, res) => {
     try {
-        // Check for table number from QR
+        // Check for table number from QR - lock it in session
         const { meja } = req.query;
         if (meja) {
             req.session.tableNumber = meja;
+            req.session.tableNumberLocked = true; // Lock table number from QR
+        }
+        
+        // If no table number set, redirect to table selection or show warning
+        if (!req.session.tableNumber) {
+            req.session.tableNumber = null;
+            req.session.tableNumberLocked = false;
         }
 
         // Get all categories
@@ -38,7 +45,8 @@ router.get('/', async (req, res) => {
             title: 'Menu - House of Nosty',
             categories,
             menuByCategory,
-            tableNumber: req.session.tableNumber
+            tableNumber: req.session.tableNumber,
+            tableNumberLocked: req.session.tableNumberLocked || false
         });
     } catch (error) {
         console.error(error);

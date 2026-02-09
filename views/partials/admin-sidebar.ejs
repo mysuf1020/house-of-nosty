@@ -41,6 +41,11 @@
             </li>
             <% if (user && user.role === 'admin') { %>
             <li class="nav-item mb-2">
+                <a class="nav-link text-white <%= typeof activeMenu !== 'undefined' && activeMenu === 'qrcodes' ? 'active bg-primary rounded' : '' %>" href="/admin/qrcodes">
+                    <i class="fas fa-qrcode me-2"></i> QR Code Meja
+                </a>
+            </li>
+            <li class="nav-item mb-2">
                 <a class="nav-link text-white <%= typeof activeMenu !== 'undefined' && activeMenu === 'users' ? 'active bg-primary rounded' : '' %>" href="/admin/users">
                     <i class="fas fa-users me-2"></i> Kelola User
                 </a>

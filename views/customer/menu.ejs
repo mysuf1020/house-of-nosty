@@ -9,8 +9,13 @@
                 <span class="fw-bold">House of Nosty</span>
             </a>
             <% if (tableNumber) { %>
-            <span class="badge bg-warning text-dark">
+            <span class="badge bg-warning text-dark" title="<%= tableNumberLocked ? 'Nomor meja terkunci dari QR Code' : '' %>">
                 <i class="fas fa-chair me-1"></i>Meja <%= tableNumber %>
+                <% if (tableNumberLocked) { %><i class="fas fa-lock ms-1"></i><% } %>
+            </span>
+            <% } else { %>
+            <span class="badge bg-secondary">
+                <i class="fas fa-exclamation-triangle me-1"></i>Scan QR Meja
             </span>
             <% } %>
         </div>

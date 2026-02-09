@@ -1,0 +1,67 @@
+<%- include('../partials/header') %>
+
+<div class="admin-wrapper d-flex">
+    <%- include('../partials/admin-sidebar', { activeMenu: 'qrcodes' }) %>
+    
+    <main class="admin-content flex-grow-1 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="fw-bold mb-1">QR Code Meja</h4>
+                <p class="text-muted mb-0">Generate dan cetak QR code untuk setiap meja</p>
+            </div>
+            <button class="btn btn-warning" onclick="window.print()">
+                <i class="fas fa-print me-1"></i>Cetak Semua
+            </button>
+        </div>
+        
+        <%- include('../partials/flash-messages') %>
+        
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Cara Penggunaan:</strong> Cetak QR code dan tempel di setiap meja. Pelanggan scan QR code untuk langsung membuka menu dengan nomor meja yang sudah terkunci.
+        </div>
+        
+        <div class="row g-4">
+            <% tables.forEach(table => { %>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="card border-0 shadow-sm text-center qr-card">
+                    <div class="card-body">
+                        <h5 class="fw-bold text-warning mb-3">Meja <%= table.number %></h5>
+                        <div class="qr-image mb-3">
+                            <img src="<%= table.qrCode %>" alt="QR Code Meja <%= table.number %>" class="img-fluid" style="max-width: 200px;">
+                        </div>
+                        <p class="small text-muted mb-2">Scan untuk pesan</p>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a href="/admin/qrcodes/<%= table.number %>/download" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-download"></i>
+                            </a>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyUrl('<%= table.url %>')">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% }) %>
+        </div>
+    </main>
+</div>
+
+<style>
+@media print {
+    .admin-sidebar, .btn, .alert, h4, p.text-muted { display: none !important; }
+    .admin-content { padding: 0 !important; }
+    .qr-card { break-inside: avoid; border: 2px solid #000 !important; margin-bottom: 20px; }
+    .col-6, .col-md-4, .col-lg-3 { width: 25% !important; }
+}
+</style>
+
+<script>
+function copyUrl(url) {
+    navigator.clipboard.writeText(url).then(() => {
+        alert('URL berhasil disalin: ' + url);
+    });
+}
+</script>
+
+<%- include('../partials/footer') %>
