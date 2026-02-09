@@ -35,6 +35,11 @@
                 </a>
             </li>
             <li class="nav-item mb-2">
+                <a class="nav-link text-white <%= typeof activeMenu !== 'undefined' && activeMenu === 'reservations' ? 'active bg-primary rounded' : '' %>" href="/admin/reservations">
+                    <i class="fas fa-calendar-check me-2"></i> Reservasi
+                </a>
+            </li>
+            <li class="nav-item mb-2">
                 <a class="nav-link text-white <%= typeof activeMenu !== 'undefined' && activeMenu === 'reports' ? 'active bg-primary rounded' : '' %>" href="/admin/reports">
                     <i class="fas fa-chart-bar me-2"></i> Laporan
                 </a>

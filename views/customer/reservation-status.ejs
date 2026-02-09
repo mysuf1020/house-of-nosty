@@ -1,0 +1,118 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main style="padding-top: 80px;">
+    <section class="py-5 bg-dark text-white">
+        <div class="container text-center">
+            <h1 class="display-5 fw-bold">Status <span class="text-warning">Reservasi</span></h1>
+            <p class="lead">Cek status reservasi Anda</p>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <%- include('../partials/flash-messages') %>
+                    
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-3"><i class="fas fa-search text-warning me-2"></i>Cari Reservasi</h6>
+                            <form action="/reservation/status" method="GET">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fab fa-whatsapp text-success"></i></span>
+                                    <input type="tel" class="form-control" name="phone" value="<%= phone %>" placeholder="Masukkan nomor HP yang digunakan saat reservasi" required>
+                                    <button type="submit" class="btn btn-warning"><i class="fas fa-search me-1"></i>Cari</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <% if (reservations.length > 0) { %>
+                    <h6 class="fw-bold mb-3">Riwayat Reservasi (<%= reservations.length %>)</h6>
+                    
+                    <% reservations.forEach(r => { 
+                        const statusConfig = {
+                            pending: { label: 'Menunggu Konfirmasi', color: 'warning', icon: 'clock', textClass: 'text-dark' },
+                            approved: { label: 'Disetujui', color: 'success', icon: 'check-circle', textClass: '' },
+                            rejected: { label: 'Ditolak', color: 'danger', icon: 'times-circle', textClass: '' },
+                            cancelled: { label: 'Dibatalkan', color: 'secondary', icon: 'ban', textClass: '' },
+                            completed: { label: 'Selesai', color: 'info', icon: 'check-double', textClass: '' }
+                        };
+                        const sc = statusConfig[r.status] || statusConfig.pending;
+                        const resDate = new Date(r.reservation_date);
+                        const dateStr = resDate.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                        const timeStr = r.reservation_time.substring(0, 5);
+                    %>
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h6 class="fw-bold mb-1"><%= r.customer_name %></h6>
+                                    <small class="text-muted"><i class="fas fa-phone me-1"></i><%= r.phone %></small>
+                                </div>
+                                <span class="badge bg-<%= sc.color %> <%= sc.textClass %>">
+                                    <i class="fas fa-<%= sc.icon %> me-1"></i><%= sc.label %>
+                                </span>
+                            </div>
+                            
+                            <div class="row g-3">
+                                <div class="col-auto">
+                                    <small class="text-muted d-block">Tanggal</small>
+                                    <span class="fw-bold"><i class="fas fa-calendar me-1 text-warning"></i><%= dateStr %></span>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted d-block">Jam</small>
+                                    <span class="fw-bold"><i class="fas fa-clock me-1 text-warning"></i><%= timeStr %> WIB</span>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted d-block">Tamu</small>
+                                    <span class="fw-bold"><i class="fas fa-users me-1 text-warning"></i><%= r.guest_count %> orang</span>
+                                </div>
+                            </div>
+                            
+                            <% if (r.notes) { %>
+                            <div class="mt-2">
+                                <small class="text-muted"><i class="fas fa-sticky-note me-1"></i>Catatan: <%= r.notes %></small>
+                            </div>
+                            <% } %>
+                            
+                            <% if (r.admin_notes) { %>
+                            <div class="mt-2 p-2 bg-light rounded">
+                                <small class="fw-bold"><i class="fas fa-comment-alt me-1 text-primary"></i>Balasan Admin:</small>
+                                <small class="d-block"><%= r.admin_notes %></small>
+                            </div>
+                            <% } %>
+                        </div>
+                    </div>
+                    <% }) %>
+                    
+                    <% } else if (phone) { %>
+                    <div class="text-center py-5">
+                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Tidak ada reservasi ditemukan</h5>
+                        <p class="text-muted">Pastikan nomor HP yang dimasukkan benar</p>
+                        <a href="/reservation" class="btn btn-warning mt-2">
+                            <i class="fas fa-plus me-1"></i>Buat Reservasi Baru
+                        </a>
+                    </div>
+                    <% } %>
+                    
+                    <div class="text-center mt-4">
+                        <a href="/reservation" class="btn btn-outline-warning">
+                            <i class="fas fa-plus me-1"></i>Buat Reservasi Baru
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="bg-dark text-white py-4">
+    <div class="container text-center">
+        <p class="mb-0">&copy; 2024 House of Nosty. All rights reserved.</p>
+    </div>
+</footer>
+
+<%- include('../partials/footer') %>

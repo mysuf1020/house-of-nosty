@@ -50,12 +50,14 @@ const menuRoutes = require('./routes/menu');
 const cartRoutes = require('./routes/cart');
 const orderRoutes = require('./routes/order');
 const adminRoutes = require('./routes/admin');
+const reservationRoutes = require('./routes/reservation');
 
 app.use('/', indexRoutes);
 app.use('/menu', menuRoutes);
 app.use('/cart', cartRoutes);
 app.use('/order', orderRoutes);
 app.use('/admin', adminRoutes);
+app.use('/reservation', reservationRoutes);
 
 // 404 Handler
 app.use((req, res) => {

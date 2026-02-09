@@ -830,4 +830,76 @@ router.get('/qrcodes/:tableNumber/download', isAuthenticated, isAdmin, async (re
     }
 });
 
+// ==================== RESERVATION MANAGEMENT ====================
+
+// List reservations
+router.get('/reservations', isAuthenticated, isKasirOrAdmin, async (req, res) => {
+    try {
+        const { status } = req.query;
+        let query = 'SELECT r.*, u.full_name as approved_by_name FROM reservations r LEFT JOIN users u ON r.approved_by = u.id';
+        const params = [];
+        
+        if (status && status !== 'all') {
+            query += ' WHERE r.status = ?';
+            params.push(status);
+        }
+        
+        query += ' ORDER BY FIELD(r.status, "pending", "approved", "rejected", "completed", "cancelled"), r.reservation_date ASC, r.reservation_time ASC';
+        
+        const [reservations] = await db.query(query, params);
+        const [pendingRows] = await db.query('SELECT COUNT(*) as count FROM reservations WHERE status = "pending"');
+        
+        res.render('admin/reservations', {
+            title: 'Kelola Reservasi - Admin House of Nosty',
+            reservations,
+            pendingCount: pendingRows[0].count,
+            filter: status || 'all'
+        });
+    } catch (error) {
+        console.error(error);
+        res.render('error', { title: 'Error', message: 'Terjadi kesalahan' });
+    }
+});
+
+// Update reservation status (approve/reject/complete)
+router.post('/reservations/:id/status', isAuthenticated, isKasirOrAdmin, async (req, res) => {
+    try {
+        const { status, adminNotes } = req.body;
+        const validStatuses = ['approved', 'rejected', 'cancelled', 'completed'];
+        
+        if (!validStatuses.includes(status)) {
+            req.flash('error_msg', 'Status tidak valid');
+            return res.redirect('/admin/reservations');
+        }
+        
+        // Get reservation info for logging
+        const [rows] = await db.query('SELECT * FROM reservations WHERE id = ?', [req.params.id]);
+        if (rows.length === 0) {
+            req.flash('error_msg', 'Reservasi tidak ditemukan');
+            return res.redirect('/admin/reservations');
+        }
+        const reservation = rows[0];
+        
+        await db.query(
+            'UPDATE reservations SET status = ?, admin_notes = ?, approved_by = ? WHERE id = ?',
+            [status, adminNotes || reservation.admin_notes, req.session.user.id, req.params.id]
+        );
+        
+        // Log activity
+        const statusLabels = { approved: 'Disetujui', rejected: 'Ditolak', cancelled: 'Dibatalkan', completed: 'Selesai' };
+        await logActivity(
+            req.session.user.id,
+            'UPDATE_RESERVATION',
+            `${req.session.user.fullName} mengubah status reservasi ${reservation.customer_name} (${reservation.phone}) menjadi ${statusLabels[status]}`
+        );
+        
+        req.flash('success_msg', `Reservasi ${reservation.customer_name} berhasil di-${statusLabels[status].toLowerCase()}`);
+        res.redirect('/admin/reservations');
+    } catch (error) {
+        console.error(error);
+        req.flash('error_msg', 'Terjadi kesalahan');
+        res.redirect('/admin/reservations');
+    }
+});
+
 module.exports = router;

@@ -1,0 +1,127 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<main style="padding-top: 80px;">
+    <section class="py-5 bg-dark text-white">
+        <div class="container text-center">
+            <h1 class="display-5 fw-bold">Reservasi <span class="text-warning">Meja</span></h1>
+            <p class="lead">Pesan meja terlebih dahulu untuk pengalaman terbaik</p>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-7">
+                    <%- include('../partials/flash-messages') %>
+                    
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-4"><i class="fas fa-calendar-check text-warning me-2"></i>Form Reservasi</h5>
+                            
+                            <form action="/reservation" method="POST">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Nama Lengkap <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="customerName" required placeholder="Masukkan nama lengkap">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Nomor WhatsApp / Telepon <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fab fa-whatsapp text-success"></i></span>
+                                        <input type="tel" class="form-control" name="phone" required placeholder="08xxxxxxxxxx">
+                                    </div>
+                                    <small class="text-muted">Kami akan menghubungi nomor ini untuk konfirmasi</small>
+                                </div>
+                                
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Tanggal <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" name="reservationDate" required id="resDate">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Jam <span class="text-danger">*</span></label>
+                                        <select class="form-select" name="reservationTime" required>
+                                            <option value="">Pilih jam</option>
+                                            <option value="08:00">08:00</option>
+                                            <option value="09:00">09:00</option>
+                                            <option value="10:00">10:00</option>
+                                            <option value="11:00">11:00</option>
+                                            <option value="12:00">12:00</option>
+                                            <option value="13:00">13:00</option>
+                                            <option value="14:00">14:00</option>
+                                            <option value="15:00">15:00</option>
+                                            <option value="16:00">16:00</option>
+                                            <option value="17:00">17:00</option>
+                                            <option value="18:00">18:00</option>
+                                            <option value="19:00">19:00</option>
+                                            <option value="20:00">20:00</option>
+                                            <option value="21:00">21:00</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Jumlah Tamu <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="guestCount" required>
+                                        <option value="">Pilih jumlah tamu</option>
+                                        <option value="1">1 orang</option>
+                                        <option value="2">2 orang</option>
+                                        <option value="3">3 orang</option>
+                                        <option value="4">4 orang</option>
+                                        <option value="5">5 orang</option>
+                                        <option value="6">6 orang</option>
+                                        <option value="7">7 orang</option>
+                                        <option value="8">8 orang</option>
+                                        <option value="9">9 orang</option>
+                                        <option value="10">10+ orang</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Catatan (Opsional)</label>
+                                    <textarea class="form-control" name="notes" rows="3" placeholder="Contoh: mau tempat indoor, ada acara ulang tahun, dll"></textarea>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-warning btn-lg w-100">
+                                    <i class="fas fa-paper-plane me-2"></i>Kirim Reservasi
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="card border-0 shadow-sm mt-4 bg-light">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-3"><i class="fas fa-info-circle text-warning me-2"></i>Informasi Penting</h6>
+                            <ul class="mb-0 small text-muted">
+                                <li>Reservasi perlu dikonfirmasi oleh admin terlebih dahulu</li>
+                                <li>Kami akan menghubungi Anda via WhatsApp/telepon untuk konfirmasi</li>
+                                <li>Mohon datang tepat waktu sesuai jadwal reservasi</li>
+                                <li>Reservasi otomatis dibatalkan jika terlambat lebih dari 30 menit</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <a href="/reservation/status" class="text-decoration-none">
+                            <i class="fas fa-search me-1"></i>Cek status reservasi saya
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="bg-dark text-white py-4">
+    <div class="container text-center">
+        <p class="mb-0">&copy; 2024 House of Nosty. All rights reserved.</p>
+    </div>
+</footer>
+
+<script>
+// Set minimum date to today
+document.getElementById('resDate').min = new Date().toISOString().split('T')[0];
+</script>
+
+<%- include('../partials/footer') %>

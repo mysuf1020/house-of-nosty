@@ -1,0 +1,127 @@
+<%- include('../partials/header') %>
+
+<div class="admin-wrapper d-flex">
+    <%- include('../partials/admin-sidebar', { activeMenu: 'reservations' }) %>
+    
+    <main class="admin-content flex-grow-1 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="fw-bold mb-1">Kelola Reservasi</h4>
+                <p class="text-muted mb-0">Setujui atau tolak permintaan reservasi pelanggan</p>
+            </div>
+            <div class="d-flex gap-2">
+                <select class="form-select form-select-sm" id="filterStatus" onchange="filterReservations()" style="width: auto;">
+                    <option value="all" <%= filter === 'all' ? 'selected' : '' %>>Semua</option>
+                    <option value="pending" <%= filter === 'pending' ? 'selected' : '' %>>Menunggu</option>
+                    <option value="approved" <%= filter === 'approved' ? 'selected' : '' %>>Disetujui</option>
+                    <option value="rejected" <%= filter === 'rejected' ? 'selected' : '' %>>Ditolak</option>
+                    <option value="completed" <%= filter === 'completed' ? 'selected' : '' %>>Selesai</option>
+                </select>
+            </div>
+        </div>
+        
+        <%- include('../partials/flash-messages') %>
+        
+        <% if (pendingCount > 0) { %>
+        <div class="alert alert-warning d-flex align-items-center">
+            <i class="fas fa-bell fa-lg me-3"></i>
+            <div>
+                <strong><%= pendingCount %> reservasi</strong> menunggu konfirmasi Anda!
+            </div>
+        </div>
+        <% } %>
+        
+        <% if (reservations.length > 0) { %>
+        <div class="row g-3">
+            <% reservations.forEach(r => { 
+                const statusConfig = {
+                    pending: { label: 'Menunggu', color: 'warning', icon: 'clock', textClass: 'text-dark' },
+                    approved: { label: 'Disetujui', color: 'success', icon: 'check-circle', textClass: '' },
+                    rejected: { label: 'Ditolak', color: 'danger', icon: 'times-circle', textClass: '' },
+                    cancelled: { label: 'Dibatalkan', color: 'secondary', icon: 'ban', textClass: '' },
+                    completed: { label: 'Selesai', color: 'info', icon: 'check-double', textClass: '' }
+                };
+                const sc = statusConfig[r.status] || statusConfig.pending;
+                const resDate = new Date(r.reservation_date);
+                const dateStr = resDate.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+                const timeStr = r.reservation_time.substring(0, 5);
+                const createdStr = new Date(r.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+            %>
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 shadow-sm h-100 <%= r.status === 'pending' ? 'border-start border-warning border-3' : '' %>">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="fw-bold mb-0"><%= r.customer_name %></h6>
+                                <a href="https://wa.me/<%= r.phone.replace(/^0/, '62').replace(/[^0-9]/g, '') %>" target="_blank" class="small text-success text-decoration-none">
+                                    <i class="fab fa-whatsapp me-1"></i><%= r.phone %>
+                                </a>
+                            </div>
+                            <span class="badge bg-<%= sc.color %> <%= sc.textClass %>">
+                                <i class="fas fa-<%= sc.icon %> me-1"></i><%= sc.label %>
+                            </span>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <div class="d-flex gap-3 flex-wrap">
+                                <span class="small"><i class="fas fa-calendar text-warning me-1"></i><%= dateStr %></span>
+                                <span class="small"><i class="fas fa-clock text-warning me-1"></i><%= timeStr %> WIB</span>
+                                <span class="small"><i class="fas fa-users text-warning me-1"></i><%= r.guest_count %> tamu</span>
+                            </div>
+                        </div>
+                        
+                        <% if (r.notes) { %>
+                        <p class="small text-muted mb-2"><i class="fas fa-sticky-note me-1"></i><%= r.notes %></p>
+                        <% } %>
+                        
+                        <small class="text-muted d-block mb-3">Dibuat: <%= createdStr %></small>
+                        
+                        <% if (r.status === 'pending') { %>
+                        <form action="/admin/reservations/<%= r.id %>/status" method="POST" class="mt-auto">
+                            <div class="mb-2">
+                                <input type="text" class="form-control form-control-sm" name="adminNotes" placeholder="Catatan untuk pelanggan (opsional)">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" name="status" value="approved" class="btn btn-success btn-sm flex-grow-1">
+                                    <i class="fas fa-check me-1"></i>Setujui
+                                </button>
+                                <button type="submit" name="status" value="rejected" class="btn btn-danger btn-sm flex-grow-1">
+                                    <i class="fas fa-times me-1"></i>Tolak
+                                </button>
+                            </div>
+                        </form>
+                        <% } else if (r.status === 'approved') { %>
+                        <form action="/admin/reservations/<%= r.id %>/status" method="POST">
+                            <button type="submit" name="status" value="completed" class="btn btn-info btn-sm w-100">
+                                <i class="fas fa-check-double me-1"></i>Tandai Selesai
+                            </button>
+                        </form>
+                        <% } %>
+                        
+                        <% if (r.admin_notes) { %>
+                        <div class="mt-2 p-2 bg-light rounded">
+                            <small class="text-muted"><i class="fas fa-comment-alt me-1"></i>Catatan admin: <%= r.admin_notes %></small>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            <% }) %>
+        </div>
+        <% } else { %>
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">Belum ada reservasi</h5>
+        </div>
+        <% } %>
+    </main>
+</div>
+
+<script>
+function filterReservations() {
+    const status = document.getElementById('filterStatus').value;
+    window.location.href = '/admin/reservations?status=' + status;
+}
+</script>
+
+<%- include('../partials/footer') %>

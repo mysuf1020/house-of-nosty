@@ -174,6 +174,25 @@ CREATE TABLE IF NOT EXISTS staff_shifts (
     UNIQUE KEY unique_shift (user_id, shift_date)
 );
 
+-- =====================================================
+-- 9. TABEL RESERVATIONS (Reservasi Meja)
+-- =====================================================
+CREATE TABLE IF NOT EXISTS reservations (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    customer_name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    reservation_date DATE NOT NULL,
+    reservation_time TIME NOT NULL,
+    guest_count INT NOT NULL DEFAULT 1,
+    notes TEXT,
+    status ENUM('pending', 'approved', 'rejected', 'cancelled', 'completed') DEFAULT 'pending',
+    admin_notes TEXT,
+    approved_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (approved_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
 -- Insert Company Info
 INSERT INTO company_info (key_name, value) VALUES 
 ('name', 'House of Nosty'),
